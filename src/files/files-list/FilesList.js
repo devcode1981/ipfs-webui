@@ -8,7 +8,7 @@ import { join } from 'path'
 import { sorts } from '../../bundles/files'
 import { normalizeFiles } from '../../lib/files'
 import { List, WindowScroller, AutoSizer } from 'react-virtualized'
-// Reac DnD
+// React DnD
 import { NativeTypes } from 'react-dnd-html5-backend'
 import { useDrop } from 'react-dnd'
 // Components
@@ -22,26 +22,47 @@ const addFiles = async (filesPromise, onAddFiles) => {
   onAddFiles(normalizeFiles(files))
 }
 
-const mergeRemotePinsIntoFiles = (files, remotePins) => {
-  const remotePinsCids = remotePins.map(c => c.cid)
+const mergeRemotePinsIntoFiles = (files, remotePins = [], pendingPins = [], failedPins = []) => {
+  const remotePinsCids = remotePins.map(id => id.split(':').at(-1))
+  const pendingPinsCids = pendingPins.map(id => id.split(':').at(-1))
+  const failedPinsCids = failedPins.map(id => id.split(':').at(-1))
 
-  return files.map(f => remotePinsCids.includes(f.cid?.string) ? ({
-    ...f,
-    isRemotePin: true
-  }) : f)
+  return files.map(f => {
+    const fileFailedPins = failedPinsCids.reduce((acc, cid, i) => {
+      if (cid === f.cid?.toString()) {
+        acc.push(failedPins[i])
+      }
+
+      return acc
+    }, [])
+
+    const isRemotePin = remotePinsCids.includes(f.cid?.toString())
+    const isPendingPin = pendingPinsCids.includes(f.cid?.toString())
+    const isFailedPin = fileFailedPins.length > 0
+
+    return {
+      ...f,
+      isRemotePin,
+      isPendingPin,
+      isFailedPin,
+      failedPins: fileFailedPins
+    }
+  })
 }
 
 export const FilesList = ({
-  className, files, pins, remotePins, filesSorting, updateSorting, downloadProgress, filesIsFetching, filesPathInfo, showLoadingAnimation,
-  onShare, onSetPinning, onInspect, onDownload, onDelete, onRename, onNavigate, onRemotePinClick, onAddFiles, onMove, handleContextMenuClick, t
+  className, files, pins, pinningServices, remotePins, pendingPins, failedPins, filesSorting, updateSorting, downloadProgress, filesIsFetching, filesPathInfo, showLoadingAnimation,
+  onShare, onSetPinning, onInspect, onDownload, onRemove, onRename, onNavigate, onRemotePinClick, onAddFiles, onMove, doFetchRemotePins, doDismissFailedPin, handleContextMenuClick, t
 }) => {
   const [selected, setSelected] = useState([])
   const [focused, setFocused] = useState(null)
   const [firstVisibleRow, setFirstVisibleRow] = useState(null)
-  const [allFiles, setAllFiles] = useState(mergeRemotePinsIntoFiles(files, remotePins))
+  const [allFiles, setAllFiles] = useState(mergeRemotePinsIntoFiles(files, remotePins, pendingPins, failedPins))
   const listRef = useRef()
   const filesRefs = useRef([])
+  const refreshPinCache = true // manually clicking on Pin Status column skips cache and updates remote status
 
+  filesPathInfo = filesPathInfo ?? {}
   const [{ canDrop, isOver, isDragging }, drop] = useDrop({
     accept: NativeTypes.FILE,
     drop: (_, monitor) => {
@@ -61,9 +82,13 @@ export const FilesList = ({
 
   const selectedFiles = useMemo(() =>
     selected
-      .map(name => files.find(el => el.name === name))
-      .filter(n => n), [files, selected]
-  )
+      .map(name => allFiles.find(el => el.name === name))
+      .filter(n => n)
+      .map(file => ({
+        ...file,
+        pinned: pins.map(p => p.toString()).includes(file.cid.toString())
+      }))
+  , [allFiles, pins, selected])
 
   const keyHandler = (e) => {
     const focusedFile = files.find(el => el.name === focused)
@@ -84,7 +109,7 @@ export const FilesList = ({
     }
 
     if (e.key === 'Delete' && selected.length > 0) {
-      return onDelete(selectedFiles)
+      return onRemove(selectedFiles)
     }
 
     if (e.key === ' ' && focused !== null) {
@@ -135,8 +160,8 @@ export const FilesList = ({
   [])
 
   useEffect(() => {
-    setAllFiles(mergeRemotePinsIntoFiles(files, remotePins))
-  }, [files, remotePins, filesSorting])
+    setAllFiles(mergeRemotePinsIntoFiles(files, remotePins, pendingPins, failedPins))
+  }, [files, remotePins, filesSorting, pendingPins, failedPins])
 
   useEffect(() => {
     const selectedFiles = selected.filter(name => files.find(el => el.name === name))
@@ -229,6 +254,9 @@ export const FilesList = ({
       if (listItem.type === 'unknown') return onInspect(listItem.cid)
       return onNavigate({ path: listItem.path, cid: listItem.cid })
     }
+    const onDismissFailedPinHandler = () => {
+      doDismissFailedPin(...listItem.failedPins)
+    }
 
     return (
       <div key={key} style={style} ref={r => { filesRefs.current[allFiles[index].name] = r }}>
@@ -240,6 +268,8 @@ export const FilesList = ({
           onSelect={toggleOne}
           onNavigate={onNavigateHandler}
           onAddFiles={onAddFiles}
+          onSetPinning={onSetPinning}
+          onDismissFailedPin={onDismissFailedPinHandler}
           onMove={move}
           focused={focused === listItem.name}
           selected={selected.indexOf(listItem.name) !== -1}
@@ -273,9 +303,10 @@ export const FilesList = ({
               </button>
             </div>
             <div className='pl2 pr1 tr f6 flex-none dn db-l mw4'>
-              <span>
-                {t('app:terms.pinStatus')}
-              </span>
+              { pinningServices && pinningServices.length
+                ? <button aria-label={t('app:terms.pinStatus')} onClick={() => doFetchRemotePins(files, refreshPinCache)}>{t('app:terms.pinStatus')}</button>
+                : <>{t('app:terms.pinStatus')}</>
+              }
             </div>
             <div className='pl2 pr4 tr f6 flex-none dn db-l mw4 w-10'>
               <button aria-label={ t('sortBy', { name: t('size') })} onClick={changeSort(sorts.BY_SIZE)}>
@@ -309,20 +340,20 @@ export const FilesList = ({
               </div>
             )}
           </WindowScroller>
-          { selected.length !== 0 && <SelectedActions
+          { selectedFiles.length !== 0 && <SelectedActions
             className={'fixed bottom-0 right-0'}
             style={{
               zIndex: 20
             }}
-            animateOnStart={selected.length === 1}
+            animateOnStart={selectedFiles.length === 1}
             unselect={() => toggleAll(false)}
-            remove={() => onDelete(selectedFiles)}
+            remove={() => onRemove(selectedFiles)}
             rename={() => onRename(selectedFiles)}
             share={() => onShare(selectedFiles)}
             setPinning={() => onSetPinning(selectedFiles)}
             download={() => onDownload(selectedFiles)}
             inspect={() => onInspect(selectedFiles[0].cid)}
-            count={selected.length}
+            count={selectedFiles.length}
             isMfs={filesPathInfo.isMfs}
             downloadProgress={downloadProgress}
             size={selectedFiles.reduce((a, b) => a + (b.size || 0), 0)} />
@@ -336,6 +367,8 @@ FilesList.propTypes = {
   className: PropTypes.string,
   files: PropTypes.array.isRequired,
   remotePins: PropTypes.array,
+  pendingPins: PropTypes.array,
+  failedPins: PropTypes.array,
   filesSorting: PropTypes.shape({
     by: PropTypes.string.isRequired,
     asc: PropTypes.bool.isRequired
@@ -349,7 +382,7 @@ FilesList.propTypes = {
   onSetPinning: PropTypes.func.isRequired,
   onInspect: PropTypes.func.isRequired,
   onDownload: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   onRename: PropTypes.func.isRequired,
   onNavigate: PropTypes.func.isRequired,
   onAddFiles: PropTypes.func.isRequired,
@@ -362,14 +395,19 @@ FilesList.propTypes = {
 
 FileList.defaultProps = {
   className: '',
-  remotePins: []
+  remotePins: [],
+  pendingPins: [],
+  failedPins: []
 }
 
 export default connect(
   'selectPins',
+  'selectPinningServices',
+  'doFetchRemotePins',
   'selectFilesIsFetching',
   'selectFilesSorting',
   'selectFilesPathInfo',
   'selectShowLoadingAnimation',
+  'doDismissFailedPin',
   withTranslation('files')(FilesList)
 )

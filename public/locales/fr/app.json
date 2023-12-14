@@ -1,6 +1,7 @@
 {
   "actions": {
     "add": "Ajouter",
+    "apply": "Appliquer",
     "browse": "Chercher",
     "cancel": "Annuler",
     "change": "Modifier",
@@ -8,7 +9,7 @@
     "close": "Fermer",
     "copy": "Copier",
     "create": "Créer",
-    "delete": "Supprimer",
+    "remove": "Supprimer",
     "download": "Télécharger",
     "edit": "Modifier",
     "import": "Importer",
@@ -23,23 +24,32 @@
     "save": "Sauvegarder",
     "saving": "Enregistrement...",
     "selectAll": "Tout sélectionner",
+    "setPinning": "Régler l'épinglage",
     "submit": "Valider",
     "unpin": "Désépingler",
-    "unselectAll": "Tout désélectionner"
+    "unselectAll": "Tout désélectionner",
+    "generate": "Générer",
+    "publish": "Publier",
+    "downloadCar": "Télécharger le CAR",
+    "done": "Terminé"
   },
   "cliModal": {
-    "description": "Collez la commande suivante dans votre terminal pour effectuer cette tâche dans IPFS via une ligne de commande. Souvenez-vous de remplacer certaines sections par vos propres paramètres aux endroits adéquats. ",
-    "extraNotes": "Si vous avez effectué des modifications à la configuration dans cette page de modification du code que vous voulez conserver, cliquez sur l'icône de téléchargement à côté du bouton de copie pour le télécharger en temps que fichier JSON."
+    "description": "Collez la commande suivante dans votre terminal pour effectuer cette tâche dans IPFS via une ligne de commande. Souvenez-vous de remplacer certaines sections par vos propres paramètres aux endroits adéquats. "
   },
   "nav": {
     "bugsLink": "Signaler un bug",
-    "codeLink": "Voir le code",
-    "revision": "Révision"
+    "codeLink": "Voir le code"
   },
   "status": {
     "connectedToIpfs": "Connecté à IPFS",
     "connectingToIpfs": "Connexion à IPFS...",
     "couldNotConnect": "La connexion à l'API IPFS a échoué"
+  },
+  "apiAddressForm": {
+    "placeholder": "Entrez une URL (http://127.0.0.1:5001) ou une Multiaddr (/ip4/127.0.0.1/tcp/5001)"
+  },
+  "publicGatewayForm": {
+    "placeholder": "Entrez une URL (https://dweb.link)"
   },
   "terms": {
     "address": "Adresse",
@@ -59,16 +69,20 @@
     "gateway": "Passerelle",
     "in": "Entrant",
     "latency": "Latence",
+    "loading": "Chargement",
     "location": "Emplacement",
     "name": "Nom",
     "node": "Nœud",
     "out": "Sortant",
     "peer": "Pair",
     "peerId": "Peer ID",
+    "id": "ID",
     "peers": "Pairs",
     "pinNoun": "Épingler",
     "pins": "Éléments épinglés",
+    "pinStatus": "Statut des épingles",
     "publicKey": "Clé publique",
+    "publicGateway": "Passerelle publique",
     "rateIn": "Ratio entrant",
     "rateOut": "Ratio sortant",
     "repo": "Répertoire",
@@ -77,7 +91,8 @@
     "totalOut": "Total sortant",
     "unknown": "Inconnu",
     "ui": "UI",
-    "upSpeed": "Sortant"
+    "upSpeed": "Sortant",
+    "revision": "Révision"
   },
   "tour": {
     "back": "Retour",

@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 import { connect } from 'redux-bundler-react'
-import isBinary from 'is-binary'
+import { isBinary } from 'istextorbinary'
 import { Trans, withTranslation } from 'react-i18next'
 import typeFromExt from '../type-from-ext'
 import ComponentLoader from '../../loader/ComponentLoader.js'
@@ -12,26 +11,22 @@ import { useDrag } from 'react-dnd'
 import fromUint8ArrayToString from 'uint8arrays/to-string'
 import Button from '../../components/button/Button'
 
-const Preview = (props) => {
-  const { name, size, cid, path } = props
+const Drag = ({ name, size, cid, path, children }) => {
   const [, drag] = useDrag({
     item: { name, size, cid, path, type: 'FILE' }
   })
 
-  const type = typeFromExt(name)
-
-  // Hack: Allows for text selection if it's a text file (bypass useDrag)
-  const dummyRef = useRef()
-
-  return <div className={ classNames(type !== 'pdf' && type !== 'text' && type !== 'json' && 'dib') } ref={type === 'text' ? dummyRef : drag}>
-    <PreviewItem {...props} type={type} />
+  return <div ref={drag}>
+    { children }
   </div>
 }
 
-const PreviewItem = ({ t, name, cid, size, type, availableGatewayUrl: gatewayUrl, read, onDownload }) => {
+const Preview = (props) => {
+  const { t, name, cid, size, availableGatewayUrl, publicGateway, read, onDownload } = props
   const [content, setContent] = useState(null)
   const [hasMoreContent, setHasMoreContent] = useState(false)
   const [buffer, setBuffer] = useState(null)
+  const type = typeFromExt(name)
 
   const loadContent = useCallback(async () => {
     const readBuffer = buffer || await read()
@@ -56,41 +51,60 @@ const PreviewItem = ({ t, name, cid, size, type, availableGatewayUrl: gatewayUrl
   }, // eslint-disable-next-line react-hooks/exhaustive-deps
   [])
 
-  const src = `${gatewayUrl}/ipfs/${cid}?filename=${encodeURIComponent(name)}`
+  const src = `${availableGatewayUrl}/ipfs/${cid}?filename=${encodeURIComponent(name)}`
   const className = 'mw-100 mt3 bg-snow-muted pa2 br2 border-box'
 
   switch (type) {
     case 'audio':
       return (
-      // eslint-disable-next-line jsx-a11y/media-has-caption
-        <audio width='100%' controls>
-          <source src={src} />
-        </audio>
+        <Drag {...props}>
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <audio width='100%' controls>
+            <source src={src} />
+          </audio>
+        </Drag>
       )
     case 'pdf':
       return (
-        <object className="FilePreviewPDF w-100" data={src} type='application/pdf'>
-          {t('noPDFSupport')}
-          <a href={src} download target='_blank' rel='noopener noreferrer' className='underline-hover navy-muted'>{t('downloadPDF')}</a>
-        </object>
+        <Drag {...props}>
+          <object className="FilePreviewPDF w-100" data={src} type='application/pdf'>
+            {t('noPDFSupport')}
+            <a href={src} download target='_blank' rel='noopener noreferrer' className='underline-hover navy-muted'>{t('downloadPDF')}</a>
+          </object>
+        </Drag>
       )
     case 'video':
       return (
-      // eslint-disable-next-line jsx-a11y/media-has-caption
-        <video controls className={className}>
-          <source src={src} />
-        </video>
+        <Drag {...props}>
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video controls className={className}>
+            <source src={src} />
+          </video>
+        </Drag>
       )
     case 'image':
-      return <img className={className} alt={name} src={src} />
+      return (
+        <Drag {...props}>
+          <img className={className} alt={name} src={src} />
+        </Drag>
+      )
     default: {
+      const srcPublic = `${publicGateway}/ipfs/${cid}?filename=${encodeURIComponent(name)}`
+
       const cantPreview = (
         <div className='mt4'>
           <p className='b'>{t('cantBePreviewed')} <span role='img' aria-label='sad'>😢</span></p>
           <p>
-            <Trans i18nKey='downloadInstead' t={t}>
-                Try <a href={src} download target='_blank' rel='noopener noreferrer' className='link blue' >downloading</a> it instead.
-            </Trans>
+            { availableGatewayUrl === publicGateway
+              ? <Trans i18nKey='openWithPublicGateway' t={t}>
+            Try opening it instead with your <a href={src} download target='_blank' rel='noopener noreferrer' className='link blue'>public gateway</a>.
+              </Trans>
+              : <Trans i18nKey='openWithLocalAndPublicGateway' t={t}>
+          Try opening it instead with your <a href={src} download target='_blank' rel='noopener noreferrer' className='link blue'>local gateway</a> or <a href={srcPublic} download target='_blank' rel='noopener noreferrer' className='link blue'>public gateway</a>.
+              </Trans>
+
+            }
+
           </p>
         </div>
       )
@@ -100,11 +114,10 @@ const PreviewItem = ({ t, name, cid, size, type, availableGatewayUrl: gatewayUrl
       }
 
       if (!content) {
-        return <ComponentLoader pastDelay />
+        return <ComponentLoader />
       }
 
-      if (isBinary(content)) {
-        loadContent()
+      if (isBinary(name, content)) {
         return cantPreview
       }
 
@@ -138,5 +151,6 @@ Preview.propTypes = {
 
 export default connect(
   'selectAvailableGatewayUrl',
+  'selectPublicGateway',
   withTranslation('files')(Preview)
 )

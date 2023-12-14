@@ -31,8 +31,6 @@ export const ACTIONS = {
   PIN_LIST: ('FILES_PIN_LIST'),
   /** @type {'FILES_SIZE_GET'} */
   SIZE_GET: ('FILES_SIZE_GET'),
-  /** @type {'FILES_PINS_SIZE_GET'} */
-  PINS_SIZE_GET: ('FILES_PINS_SIZE_GET'),
   /** @type {'FILES_DISMISS_ERRORS'} */
   DISMISS_ERRORS: ('FILES_DISMISS_ERRORS'),
   /** @type {'FILES_CLEAR_ALL'} */
@@ -60,8 +58,6 @@ export const IGNORED_FILES = [
 export const DEFAULT_STATE = {
   pageContent: null,
   mfsSize: -1,
-  pinsSize: 0,
-  numberOfPins: 0,
   pins: [],
   sorting: { // TODO: cache this
     by: SORTING.BY_NAME,
@@ -74,7 +70,7 @@ export const DEFAULT_STATE = {
 
 export const cliCmdKeys = {
   DOWNLOAD_OBJECT_COMMAND: 'downloadObjectCommand',
-  DELETE_FILE_FROM_IPFS: 'deleteFileFromIpfs',
+  REMOVE_FILE_FROM_IPFS: 'removeFileFromIpfs',
   UPDATE_IPFS_CONFIG: 'updateIpfsConfig',
   PIN_OBJECT: 'pinObject',
   RENAME_IPFS_OBJECT: 'renameObject',
@@ -82,7 +78,13 @@ export const cliCmdKeys = {
   ADD_DIRECTORY: 'addNewDirectory',
   CREATE_NEW_DIRECTORY: 'createNewDirectory',
   FROM_IPFS: 'fromIpfs',
-  ADD_NEW_PEER: 'addNewPeer'
+  ADD_NEW_PEER: 'addNewPeer',
+  PUBLISH_WITH_IPNS: 'publishWithIPNS',
+  DOWNLOAD_CAR_COMMAND: 'downloadCarCommand'
+}
+
+export const cliCmdPrefixes = {
+  PIN_OBJECT: 'ipfs pin'
 }
 
 export const cliCommandList = {
@@ -90,7 +92,7 @@ export const cliCommandList = {
   /**
    * @param {string} filePath
    */
-  [cliCmdKeys.DELETE_FILE_FROM_IPFS]: (filePath) => `ipfs files rm -r "${filePath}"`,
+  [cliCmdKeys.REMOVE_FILE_FROM_IPFS]: (filePath) => `ipfs files rm -r "${filePath}"`,
   /**
    * @param {string} cid
    */
@@ -99,7 +101,7 @@ export const cliCommandList = {
    * @param {string} cid
    * @param {string} op
    */
-  [cliCmdKeys.PIN_OBJECT]: (cid, op) => `ipfs pin ${op} ${cid}`,
+  [cliCmdKeys.PIN_OBJECT]: (cid, op) => `${cliCmdPrefixes.PIN_OBJECT} ${op} ${cid}`,
   /**
    * @param {string} filePath
    * @param {string} fileName
@@ -123,6 +125,15 @@ export const cliCommandList = {
   /**
    * @param {string} path
    */
-  [cliCmdKeys.FROM_IPFS]: (path) => `ipfs cp /ipfs/<cid> "${path}/<dest-name>"`,
-  [cliCmdKeys.ADD_NEW_PEER]: () => 'ipfs swarm connect <peer-multiaddr>'
+  [cliCmdKeys.FROM_IPFS]: (path) => `ipfs files cp /ipfs/<cid> "${path}/<dest-name>"`,
+  [cliCmdKeys.ADD_NEW_PEER]: () => 'ipfs swarm connect <peer-multiaddr>',
+  /**
+   * @param {string} ipfsPath
+   * @param {string} name
+   */
+  [cliCmdKeys.PUBLISH_WITH_IPNS]: (ipfsPath, name) => `ipfs name publish ${ipfsPath} --key="${name}"`,
+  /**
+   * @param {string} cid
+   */
+  [cliCmdKeys.DOWNLOAD_CAR_COMMAND]: (cid) => `ipfs dag export ${cid}`
 }

@@ -9,7 +9,7 @@
     "close": "Close",
     "copy": "Copy",
     "create": "Create",
-    "delete": "Delete",
+    "remove": "Remove",
     "download": "Download",
     "edit": "Edit",
     "import": "Import",
@@ -27,21 +27,29 @@
     "setPinning": "Set pinning",
     "submit": "Submit",
     "unpin": "Unpin",
-    "unselectAll": "Unselect all"
+    "unselectAll": "Unselect all",
+    "generate": "Generate",
+    "publish": "Publish",
+    "downloadCar": "Download as CAR",
+    "done": "Done"
   },
   "cliModal": {
-    "description": "Paste the following into your terminal to do this task in IPFS via the command line. Remember that you'll need to replace placeholders with your specific parameters.",
-    "extraNotes": "If you've made changes to the config in this page's code editor that you'd like to save, click the download icon next to the copy button to download it as a JSON file."
+    "description": "Paste the following into your terminal to do this task in IPFS via the command line. Remember that you'll need to replace placeholders with your specific parameters."
   },
   "nav": {
     "bugsLink": "Report a bug",
-    "codeLink": "See the code",
-    "revision": "Revision"
+    "codeLink": "See the code"
   },
   "status": {
     "connectedToIpfs": "Connected to IPFS",
     "connectingToIpfs": "Connecting to IPFS…",
     "couldNotConnect": "Could not connect to the IPFS API"
+  },
+  "apiAddressForm": {
+    "placeholder": "Enter a URL (http://127.0.0.1:5001) or a Multiaddr (/ip4/127.0.0.1/tcp/5001)"
+  },
+  "publicGatewayForm": {
+    "placeholder": "Enter a URL (https://dweb.link)"
   },
   "terms": {
     "address": "Address",
@@ -68,11 +76,13 @@
     "out": "Out",
     "peer": "Peer",
     "peerId": "Peer ID",
+    "id": "ID",
     "peers": "Peers",
     "pinNoun": "Pin",
     "pins": "Pins",
     "pinStatus": "Pin Status",
     "publicKey": "Public key",
+    "publicGateway": "Public Gateway",
     "rateIn": "Rate in",
     "rateOut": "Rate out",
     "repo": "Repo",
@@ -81,7 +91,8 @@
     "totalOut": "Total out",
     "unknown": "Unknown",
     "ui": "UI",
-    "upSpeed": "Outgoing"
+    "upSpeed": "Outgoing",
+    "revision": "Revision"
   },
   "tour": {
     "back": "Back",

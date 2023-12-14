@@ -1,7 +1,7 @@
 import { createSelector } from 'redux-bundler'
 
 // Depends on nodeBandwidthBundle
-export default function (opts) {
+function createNodeBandwidthChart (opts) {
   opts = opts || {}
   // Only store up to 1 day of data
   opts.windowSize = opts.windowSize || 1000 * 60 * 60 * 24
@@ -22,7 +22,7 @@ export default function (opts) {
     doUpdateNodeBandwidthChartData: (bw, timestamp, chartData) => ({ dispatch }) => {
       chartData = {
         in: chartData.in.concat({ x: timestamp, y: parseInt(bw.rateIn.toFixed(0), 10) }),
-        out: chartData.out.concat({ x: timestamp, y: parseInt(bw.rateOut.toFixed(0), 10) })
+        out: chartData.out.concat({ x: timestamp, y: parseInt(bw.rateOut.toFixed(0) * -1, 10) })
       }
 
       const startIndex = chartData.in.findIndex(d => d.x >= timestamp - opts.windowSize)
@@ -53,3 +53,4 @@ export default function (opts) {
     )
   }
 }
+export default createNodeBandwidthChart

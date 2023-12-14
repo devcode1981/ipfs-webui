@@ -16,17 +16,22 @@
     "paragraph3": "<0>Fă cunoștință cu IPLD: un namespace unic pentru toate protocoalele inspirate de hash-uri. Prin intermediul IPLD, link-urile pot fi parcurse folosind diferite protocoale, fiind permisă explorarea datelor indiferent de protocolul de la bază.</0>"
   },
   "ExplorePage": {
-    "title": "Explorare | IPLD"
+    "title": "Explorare - IPLD"
   },
   "IpldExploreForm": {
     "explore": "Explorează"
+  },
+  "IpldCarExploreForm": {
+    "imports": "Importă",
+    "uploadCarFile": "Încarcă un fișier CAR"
   },
   "CidInfo": {
     "header": "Informații CID",
     "hashDigest": "Hash digest"
   },
   "ObjectInfo": {
-    "gatewayLink": "Vizualizează prin IPFS Gateway"
+    "publicGateway": "View on Public Gateway",
+    "privateGateway": "View on Local Gateway"
   },
   "base": "bază",
   "version": "versiune",

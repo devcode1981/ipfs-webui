@@ -1,6 +1,7 @@
 {
   "actions": {
     "add": "Hinzufügen",
+    "apply": "Anwenden",
     "browse": "Durchstöbern",
     "cancel": "Abbrechen",
     "change": "Ändern",
@@ -8,7 +9,7 @@
     "close": "Schließen",
     "copy": "Kopieren",
     "create": "Erstellen",
-    "delete": "Löschen",
+    "remove": "Entfernen",
     "download": "Herunterladen",
     "edit": "Bearbeiten",
     "import": "Importieren",
@@ -23,23 +24,32 @@
     "save": "Speichern",
     "saving": "Speichervorgang läuft…",
     "selectAll": "Alle auswählen",
+    "setPinning": "Anheften einstellen",
     "submit": "Absenden",
     "unpin": "Loslösen",
-    "unselectAll": "Alle abwählen"
+    "unselectAll": "Alle abwählen",
+    "generate": "Generieren",
+    "publish": "Veröffentlichen",
+    "downloadCar": "Als CAR herunterladen",
+    "done": "Fertig"
   },
   "cliModal": {
-    "description": "Paste the following into your terminal to do this task in IPFS via the command line. Remember that you'll need to replace placeholders with your specific parameters.",
-    "extraNotes": "If you've made changes to the config in this page's code editor that you'd like to save, click the download icon next to the copy button to download it as a JSON file."
+    "description": "Füge folgendes in dein Terminal ein, um diese Aufgabe in IPFS über die Kommandozeile auszuführen. Denke daran, dass du Platzhalter durch Ihre spezifischen Parameter ersetzen musst."
   },
   "nav": {
     "bugsLink": "Fehler melden",
-    "codeLink": "Quelltext anzeigen",
-    "revision": "Revision"
+    "codeLink": "Quelltext anzeigen"
   },
   "status": {
     "connectedToIpfs": "Mit dem IPFS verbunden",
     "connectingToIpfs": "Mit IPFS verbinden…",
     "couldNotConnect": "Es konnte keine Verbindung zur IPFS-API hergestellt werden"
+  },
+  "apiAddressForm": {
+    "placeholder": "Gib eine URL (http://127.0.0.1:5001) oder eine Multiadresse (/ip4/127.0.0.1/tcp/5001) ein"
+  },
+  "publicGatewayForm": {
+    "placeholder": "Gib eine URL ein (https://dweb.link)"
   },
   "terms": {
     "address": "Adresse",
@@ -59,16 +69,20 @@
     "gateway": "Gateway",
     "in": "Eingang",
     "latency": "Latenz",
+    "loading": "Wird geladen",
     "location": "Standort",
     "name": "Name",
-    "node": "Node",
+    "node": "Knoten",
     "out": "Ausgang",
     "peer": "Peer",
     "peerId": "Peer-ID",
+    "id": "ID",
     "peers": "Peers",
     "pinNoun": "Anpinnen",
     "pins": "Pins",
+    "pinStatus": "Anheftstatus",
     "publicKey": "Öffentlicher Schlüssel",
+    "publicGateway": "Öffentliches Gateway",
     "rateIn": "Eingangsrate",
     "rateOut": "Ausgangsrate",
     "repo": "Speicher",
@@ -77,7 +91,8 @@
     "totalOut": "Gesamtausgang",
     "unknown": "Unbekannt",
     "ui": "UI",
-    "upSpeed": "Ausgehend"
+    "upSpeed": "Ausgehend",
+    "revision": "Revision"
   },
   "tour": {
     "back": "Zurück",

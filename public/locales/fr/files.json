@@ -4,20 +4,25 @@
   "breadcrumbs": "Fils d'Ariane",
   "finished": "Terminé !",
   "totalSize": "Taille totale: {size}",
-  "filesSelected": "{count, plural, one {Fichiers sélectionnés} other {Fichiers sélectionnés}}",
+  "filesSelected": "{count, plural, one {Élément sélectionné} many {Éléments sélectionnés} other {Éléments sélectionnés}}",
   "menuOptions": "Options pour l'élément sélectionné ",
   "selectedAllEntries": "Tout sélectionner",
   "individualFilesOnly": "Disponible uniquement pour les fichiers individuels",
   "noPDFSupport": "Votre navigateur ne prend pas en charge les PDF. Merci de télécharger le PDF pour le visualiser :",
   "downloadPDF": "Télécharger un PDF",
-  "downloadInstead": "Essayer de <1>le télécharger</1> à la place.",
+  "openWithPublicGateway": "Essayer de l'ouvrir plutôt avec votre <1>passerelle publique</1>.",
+  "openWithLocalAndPublicGateway": "Essayer de l'ouvrir plutôt avec votre <1>passerelle locale</1> ou votre <3>passerelle publique</3>.",
   "cantBePreviewed": "Désolé, ce fichier ne peut pas être prévisualisé",
   "addByPath": "Depuis IPFS",
   "newFolder": "Nouveau répertoire",
   "generating": "Génération...",
   "actions": {
     "copyHash": "Copier le CID",
-    "share": "Partager"
+    "share": "Partager",
+    "publishWithIpns": "Publier via IPNS"
+  },
+  "cliModal": {
+    "extraNotesPinning": "Cette commande est seulement pour l'épinglage/désépinglage local. Si vous voulez utiliser un service d'épinglage distant, consultez la documentation de ce service pour apprendre comment épingler/désépingler depuis la ligne de commande."
   },
   "shareModal": {
     "title": "Partager des fichiers",
@@ -29,17 +34,28 @@
     "descriptionFile": "Choisir un nouveau nom pour ce fichier.",
     "descriptionFolder": "Choisir un nouveau nom pour ce dossier."
   },
-  "deleteModal": {
-    "titleItem": "{count, plural, one {Supprimer l'élément} other {Supprimer {count} éléments}}",
-    "titleFolder": "{count, plural, one {Supprimer le dossier} other {Supprimer {count} dossiers}}",
-    "titleFile": "{count, plural, one {Supprimer le fichier} other {Supprimer {count} fichiers}}",
-    "descriptionItem": "{count, plural, one {Etes-vous sûr(e) de vouloir supprimer cet élément? Cette action est définitive et ne peut être annulée.} other {Êtes-vous sûr(e) de vouloir supprimer ces {count} éléments? Cette action est définitive et ne peut être annulée.}}",
-    "descriptionFolder": "{count, plural, one {Etes-vous sûr(e) de vouloir supprimer ce dossier? Cette action est définitive et ne peut être annulée.} other {Êtes-vous sûr(e) de vouloir supprimer ces {count} dossiers? Cette action est définitive et ne peut être annulée.}}",
-    "descriptionFile": "{count, plural, one {Etes-vous sûr(e) de vouloir supprimer ce fichier? Cette action est définitive et ne peut être annulée.} other {Êtes-vous sûr(e) de vouloir supprimer ces {count} fichiers? Cette action est définitive et ne peut être annulée.}}"
+  "removeModal": {
+    "titleItem": "{count, plural, one {Supprimer l'élément {name} ?} many {Supprimer {count} éléments ?} other {Supprimer {count} éléments ?}}",
+    "titleFolder": "{count, plural, one {Supprimer le dossier {name} ?} many {Supprimer {count} dossiers ?} other {Supprimer {count} dossiers ?}}",
+    "titleFile": "{count, plural, one {Supprimer le fichier {name} ?} many {Supprimer {count} fichiers ?} other {Supprimer {count} fichiers ?}}",
+    "descriptionItem": "{count, plural, one {Êtes-vous sûr(e) de vouloir supprimer cet élément ? Il n'apparaîtra plus dans l'onglet Fichiers, et sera supprimé de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.} many {Êtes-vous sûr(e) de vouloir supprimer ces {count} éléments ? Ils n'apparaitront plus dans l'onglet Fichiers, et seront supprimés de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.} other {Êtes-vous sûr(e) de vouloir supprimer ces {count} éléments ? Ils n'apparaitront plus dans l'onglet Fichiers, et seront supprimés de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.}}",
+    "descriptionFolder": "{count, plural, one {Êtes-vous sûr(e) de vouloir supprimer ce dossier ? Il n'apparaitra plus dans l'onglet Fichiers, et sera supprimé de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.} many {Êtes-vous sûr(e) de vouloir supprimer ces {count} dossiers ? Ils n'apparaitront plus dans l'onglet Fichiers, et seront supprimés de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.} other {Êtes-vous sûr(e) de vouloir supprimer ces {count} dossiers ? Ils n'apparaitront plus dans l'onglet Fichiers, et seront supprimés de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.}}",
+    "descriptionFile": "{count, plural, one {Êtes-vous sûr(e) de vouloir supprimer ce fichier? Il n'apparaitra plus dans l'onglet Fichiers, et sera supprimé de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.} many {Êtes-vous sûr(e) de vouloir supprimer ces {count} fichiers ? Ils n'apparaitront plus dans l'onglet Fichiers, et seront supprimés de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.} other {Êtes-vous sûr(e) de vouloir supprimer ces {count} fichiers ? Ils n'apparaitront plus dans l'onglet Fichiers, et seront supprimés de façon définitive lors du prochain nettoyage (mais des copies peuvent exister sur d'autres nœuds IPFS). Cette action est irréversible.}}",
+    "checkboxRemoveLocalPin": "Aussi supprimer l'épinglage local (recommandé)",
+    "checkboxUnpinFromServices": "Désépingler de tous les services d'épinglage"
+  },
+  "pinningModal": {
+    "title": "Choisissez où vous vouler épingler ces éléments. ",
+    "complianceLabel": "🔍 Vérifier la conformance des services d'épinglage",
+    "footer": "Besoin d'ajouter ou de configurer un service d'épinglage? Allez aux <1>Paramètres</1>.",
+    "localNode": "Nœud local",
+    "totalSize": "Taille totale: {size}"
   },
   "addByPathModal": {
     "title": "Importer depuis IPFS",
     "description": "Entrez un chemin IPFS (CID) pour l'importer.",
+    "importPathPlaceholder": "Chemin ou CID (requis)",
+    "namePlaceholder": "Nom (optionnel)",
     "examples": "Exemples :"
   },
   "newFolderModal": {
@@ -51,8 +67,8 @@
     "noFiles": "<0>Pas de fichiers dans ce dossier. Cliquez sur le boutton \"Importer\" pour en ajouter.</0>"
   },
   "filesImportStatus": {
-    "imported": "{count, plural, one {1 élément importé} other {{count} éléments importés}}",
-    "importing": "{count, plural, one {Import de 1 élément} other {Import de {count} éléments}}",
+    "imported": "{count, plural, one {1 élément importé} many {{count} éléments importés} other {{count} éléments importés}}",
+    "importing": "{count, plural, one {Import de 1 élément} many {Import de {count} éléments} other {Import de {count} éléments}}",
     "toggleDropdown": "Dérouler la liste",
     "closeDropdown": "Fermer la liste",
     "count": "{count} sur {count}"
@@ -81,7 +97,7 @@
     "step5": {
       "title": "Liste des fichiers",
       "paragraph1": "Finallement, vous pouvez ajouter des fichiers et des dossiers en utilisant le glisser deposer.",
-      "paragraph2": "Vous pouvez partager ou télécharger des fichiers, inpecter cela dans IPLD Explorer, les renomer ou encore les supprimer.",
+      "paragraph2": "Vous pouvez partager ou télécharger des fichiers, les inspecter dans l'Explorateur de IPLD, les renommer, ou les supprimer !",
       "paragraph3": "Astuce : glissez-déposez un fichier n'importe où sur l'interface web pour l'ajouter à la racine de votre MFS."
     }
   },
@@ -91,6 +107,31 @@
   "hashUnavailable": "hash non disponible",
   "checkboxLabel": "Voir plus d'options pour {name}",
   "pinned": "Épinglé",
-  "cidNotFileNorDir": "Le lien courant n'est pas un fichier, peut être un dossier. Essayer de l'<0>inspecter</0>.",
-  "sortBy": "Trier les éléments par {name}"
+  "pinnedRemotely": "Épinglé à distance",
+  "pinningRemotely": "Épinglage à distance",
+  "pinningCompleted": "Épinglage terminé",
+  "pinningFailed": "L'épinglage a échoué",
+  "clickToDismiss": "Cliquez pour fermer",
+  "clickToCancel": "Cliquez pour annuler",
+  "blocks": "Blocs",
+  "allBlocks": "Tous les blocs",
+  "allBlocksDescription": "Taille totale des blocs de tout votre nœud IPFS. Cela inclut tout ce qui se trouve dans Fichiers, plus tous les éléments épinglés localement et le cache de données temporaire",
+  "filesDescription": "Taille totale des données dans ce dossier (si c'est un sous-dossier, la taille de tous les données dans Fichiers est aussi affichée)",
+  "pinningQueue": "Queue d'épinglage",
+  "more": "Plus",
+  "files": "Fichiers",
+  "cidNotFileNorDir": "Le lien actuel n'est ni un fichier ni un dossier. Essayez plutôt de <1>l'inspecter</1>.",
+  "sortBy": "Trier les éléments par {name}",
+  "publishModal": {
+    "title": "Publier via IPNS",
+    "cidToPublish": "CID :",
+    "publishUnderKey": "Sélectionner une clé pour publier :",
+    "help": "Allez dans Paramètres pour en savoir plus à propos d'IPNS et créer plus de clés.",
+    "publishedUnderKey": "Publié avec succès sous la clé :",
+    "linkCopied": "Lien copié !",
+    "sharingPrompt": "Copiez le lien ci-dessous et partagez-le avec les autres. L'adresse IPNS sera résolue tant que votre nœud reste disponible sur le réseau une fois par jour pour rafraichir l'enregistrement IPNS. ",
+    "pleaseWait": "Merci d'attendre pendant que les 20 premières copies de l'enregistrement IPNS mis à jour sont stockés avec l'aide des pairs DHT..."
+  },
+  "noPinsInProgress": "Terminé, aucun épinglage distant en cours.",
+  "remotePinningInProgress": "Épinglage distant en cours:"
 }

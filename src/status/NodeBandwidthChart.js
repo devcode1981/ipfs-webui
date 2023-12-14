@@ -7,8 +7,15 @@ import PropTypes from 'prop-types'
 import filesize from 'filesize'
 import { Title } from './Commons'
 
-const chartsize = filesize.partial({ round: 1, exponent: 2, bits: true })
-const tootltipSize = filesize.partial({ round: 0, bits: true, output: 'array' })
+// matching units returned by 'ipfs stats bw' in CLI
+const bwUnits = {
+  standard: 'iec',
+  base: 2,
+  bits: false
+}
+
+const chartsize = filesize.partial({ round: 1, exponent: 2, ...bwUnits })
+const tootltipSize = filesize.partial({ round: 0, output: 'array', ...bwUnits })
 
 const defaultSettings = {
   defaultFontFamily: "'Inter UI', system-ui, sans-serif",
@@ -36,6 +43,7 @@ const defaultSettings = {
     }]
   },
   legend: {
+    reverse: true,
     display: true,
     position: 'bottom'
   }
@@ -120,18 +128,18 @@ class NodeBandwidthChart extends React.Component {
       return {
         datasets: [
           {
-            label: t('app:terms.in'),
-            data: nodeBandwidthChartData.in,
-            borderColor: gradientIn,
-            backgroundColor: gradientIn,
-            pointRadius: 2,
-            cubicInterpolationMode: 'monotone'
-          },
-          {
             label: t('app:terms.out'),
             data: nodeBandwidthChartData.out,
             borderColor: gradientOut,
             backgroundColor: gradientOut,
+            pointRadius: 2,
+            cubicInterpolationMode: 'monotone'
+          },
+          {
+            label: t('app:terms.in'),
+            data: nodeBandwidthChartData.in,
+            borderColor: gradientIn,
+            backgroundColor: gradientIn,
             pointRadius: 2,
             cubicInterpolationMode: 'monotone'
           }
@@ -171,8 +179,8 @@ class NodeBandwidthChart extends React.Component {
             data.show = false
           } else {
             data.bw = {
-              in: tootltipSize(model.dataPoints[0].yLabel),
-              out: tootltipSize(model.dataPoints[1].yLabel)
+              out: tootltipSize(Math.abs(model.dataPoints[0].yLabel)),
+              in: tootltipSize(Math.abs(model.dataPoints[1].yLabel))
             }
 
             const rect = this._chart.canvas.getBoundingClientRect()

@@ -3,10 +3,10 @@
   "tabName": "Prozkoumat",
   "homeLink": "Hlavní stránka",
   "UpdateAvailable": {
-    "paragraph1": "A new version of IPLD Explorer is available; <1>please reload</1>."
+    "paragraph1": "K dispozici je nová verze aplikace IPLD Explorer; <1>prosím obnovte</1>."
   },
   "StartExploringPage": {
-    "title": "Průzkumník | IPLD",
+    "title": "Průzkumník - IPLD",
     "header": "Prozkoumejte Merkelův les",
     "leadParagraph": "Pro zobrazeni informací o IPLD uzlu vložte do pole vaše CID nebo si vyberte z několika příkladů."
   },
@@ -16,17 +16,22 @@
     "paragraph3": "<0>Zadejte IPLD: jeden jmenný prostor pro všechny protokoly inspirované hashem. Prostřednictvím IPLD lze odkazy procházet přes protokoly, což vám umožní prozkoumávat data bez ohledu na základní protokol.</0>"
   },
   "ExplorePage": {
-    "title": "Prozkoumáváme | IPLD"
+    "title": "Prozkoumáváme - IPLD"
   },
   "IpldExploreForm": {
     "explore": "Prozkoumat"
+  },
+  "IpldCarExploreForm": {
+    "imports": "Import",
+    "uploadCarFile": "Nahrát soubor CAR"
   },
   "CidInfo": {
     "header": "CID info",
     "hashDigest": "Hash digest"
   },
   "ObjectInfo": {
-    "gatewayLink": "Zobrazit na IPFS bráně"
+    "publicGateway": "Zobrazení na veřejné bráně",
+    "privateGateway": "Zobrazení na místní bráně"
   },
   "base": "základ",
   "version": "verze",
@@ -40,7 +45,7 @@
     "explorer": {
       "step1": {
         "title": "IPLD Průzkumník",
-        "paragraph1": "Your journey with IPLD Explorer starts here. Click \"Next\" to learn more."
+        "paragraph1": "Vaše cesta s IPLD Explorer začíná zde. Klikněte na \"Další\" a dozvíte se více."
       },
       "step2": {
         "title": "Cesta",

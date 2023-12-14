@@ -3,9 +3,14 @@
   "save": "Save",
   "saving": "Saving…",
   "reset": "Reset",
+  "learnMoreLink": "Learn more.",
+  "showOptions": "Show options",
   "pinningServices": {
     "title": "Pinning Services",
-    "description": "Support for third-party remote pinning services will be implemented in a future release, and you'll be able to add and configure them here. In the meantime, use local pinning when you want to ensure an item on your node is never garbage-collected, even if you remove it from Files."
+    "description": "Use local pinning when you want to ensure an item on your node is never garbage-collected, even if you remove it from Files. You can also link your accounts with other remote pinning services to automatically or selectively persist files with those providers, enabling you to keep backup copies of your files and/or make them available to others when your local node is offline.",
+    "noPinRemoteDescription": "Support for third-party remote pinning services is missing. Update your IPFS node to Kubo 0.8.0 or later, and you'll be able to add and configure them here.",
+    "addAutoUpload": "Enable auto upload",
+    "removeAutoUpload": "Disable Auto Upload"
   },
   "language": "Language",
   "analytics": "Analytics",
@@ -18,7 +23,11 @@
     "translationProjectLink": "Join the IPFS Translation Project"
   },
   "apiDescription": "<0>If your node is configured with a <1>custom API address</1>, including a port other than the default 5001, enter it here.</0>",
+  "publicGatewayDescription": "<0>Choose which <1>public gateway</1> you want to use when generating shareable links.</0>",
   "cliDescription": "<0>Enable this option to display a \"view code\" <1></1> icon next to common IPFS commands. Clicking it opens a modal with that command's CLI code, so you can paste it into the IPFS command-line interface in your terminal.</0>",
+  "cliModal": {
+    "extraNotesJsonConfig": "If you've made changes to the config in this page's code editor that you'd like to save, click the download icon next to the copy button to download it as a JSON file."
+  },
   "pinningModal": {
     "title": "Select a pinning service provider.",
     "description": "Don’t see your pinning service provider? <1>Add a custom one.<1>"
@@ -31,20 +40,32 @@
     "nicknamePlaceholder": "Name for your service",
     "apiEndpoint": "API endpoint",
     "apiEndpointPlaceholder": "URL for its API endpoint",
-    "secretApiKey": "Secret API key",
-    "autoUpload": "Auto upload"
+    "secretApiKey": "Secret access token",
+    "secretApiKeyHowToLink": "How to generate a new token",
+    "autoUpload": "Auto upload",
+    "complianceLabel": "🔍 {nickname} pinning compliance report"
+  },
+  "autoUploadModal": {
+    "title": "Change upload policy for {name}",
+    "description": "When enabled, auto upload will periodically pin the root of your Files directory, ensuring everything is pinned remotely and available to other peers even when your local IPFS node goes offline. If you disable it, you can still pin each file manually using the \"Set pinning\" option on the Files screen."
   },
   "errors": {
     "nickname": "Nickname is required",
+    "apiError": "API error",
     "apiEndpoint": "Must be a valid URL",
-    "secretApiKey": "Secret key is required"
+    "secretApiKey": "Secret access token is required",
+    "failedToFetch": "Failed to fetch",
+    "failedToFetchTitle": "Unable to fetch pin count from this remote service. Make sure it is online and that you entered correct credentials. If this is a newly added service, try removing and adding it again."
   },
   "actions": {
     "addService": "Add Service",
+    "generateKey": "Generate Key",
     "edit": "Change",
     "close": "Close",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "enable": "Enable",
+    "disable": "Disable"
   },
   "edit": "Edit",
   "visitService": "Visit service",
@@ -54,10 +75,9 @@
   "size": "Size",
   "pins": "Pins",
   "autoUpload": "Auto Upload",
-  "autoUploadKeys": {
-    "ALL_FILES": "All files",
-    "DISABLED": "Disabled",
-    "PINS_ONLY": "Pins only"
+  "autoUploadPolicy": {
+    "true": "All files",
+    "false": "Off"
   },
   "fetchingSettings": "Fetching settings...",
   "configApiNotAvailable": "The IPFS config API is not available. Please disable the \"IPFS Companion\" Web Extension and try again.",
@@ -113,19 +133,27 @@
       "paragraph2": "If you're running IPFS Desktop you'll have some specific settings for it too."
     },
     "step2": {
+      "title": "Custom API address",
+      "paragraph1": "If you've configured your IPFS node with a custom API address, you can update your config file right here instead of editing the JSON by hand."
+    },
+    "step3": {
+      "title": "Pinning services",
+      "paragraph1": "<0>If you have accounts with third-party remote pinning services, add them here so you can pin/unpin items to those services directly from the Files screen. You can learn more about third-party pinning services in the <1>IPFS Docs</1>.</0>"
+    },
+    "step4": {
       "title": "Language selector",
       "paragraph1": "<0>You can change the language of the Web UI. If your preferred language isn't available, head over our project page in <1>Transifex</1> to help us translate!</0>"
     },
-    "step3": {
+    "step5": {
       "title": "Anonymous usage analytics",
       "paragraph1": "If you opt-in, you can help us make the Web UI better by sending anonymous usage analytics.",
       "paragraph2": "You're able to choose what data you send us and we won't be able to identify you, we value privacy above all else."
     },
-    "step4": {
-      "title": "Custom API address",
-      "paragraph1": "If you've configured your IPFS node with a custom API address, you can update your config file right here instead of editing the JSON by hand."
+    "step6": {
+      "title": "CLI tutor mode",
+      "paragraph1": "Enable CLI tutor mode to see shortcuts to the command-line version of common IPFS commands — helpful if you're learning to use IPFS from the terminal, or if you just need a refresher."
     },
-    "step5": {
+    "step7": {
       "title": "IPFS Config",
       "paragraph1": "You can change the config of your IPFS node right from Web UI!",
       "paragraph2": "Don't forget to restart the daemon to apply the changes."
@@ -136,5 +164,21 @@
     "issueUrl": "Open an issue",
     "feedbackUrl": "💌Leave feedback",
     "readMoreUrl": "Read More"
+  },
+  "ipnsPublishingKeys": {
+    "title": "IPNS Publishing Keys",
+    "description": "The InterPlanetary Name System (IPNS) provides cryptographic addresses for publishing updates to content that is expected to change over time. This feature requires your node to be online at least once a day to ensure IPNS records are kept alive on the public DHT."
+  },
+  "generateKeyModal": {
+    "title": "Generate New IPNS Key",
+    "description": "Enter a nickname for this key to generate:"
+  },
+  "renameKeyModal": {
+    "title": "Rename Key",
+    "description": "Enter a new nickname for the IPNS key <1>{name}</1>."
+  },
+  "removeKeyModal": {
+    "title": "Confirm IPNS Key Removal",
+    "description": "Are you sure you want to delete the IPNS key <1>{name}</1>? This operation can't be undone, and the IPNS address managed by this key will be lost FOREVER. Consider backing it up first: ipfs key export --help"
   }
 }

@@ -7,9 +7,10 @@ import Overlay from '../../components/overlay/Overlay'
 import NewFolderModal from './new-folder-modal/NewFolderModal'
 import ShareModal from './share-modal/ShareModal'
 import RenameModal from './rename-modal/RenameModal'
-import DeleteModal from './delete-modal/DeleteModal'
 import PinningModal from './pinning-modal/PinningModal'
+import RemoveModal from './remove-modal/RemoveModal'
 import AddByPathModal from './add-by-path-modal/AddByPathModal'
+import PublishModal from './publish-modal/PublishModal'
 import CliTutorMode from '../../components/cli-tutor-mode/CliTutorMode'
 import { cliCommandList, cliCmdKeys } from '../../bundles/files/consts'
 import { realMfsPath } from '../../bundles/files/actions'
@@ -21,6 +22,7 @@ const DELETE = 'delete'
 const ADD_BY_PATH = 'add_by_path'
 const CLI_TUTOR_MODE = 'cli_tutor_mode'
 const PINNING = 'pinning'
+const PUBLISH = 'publish'
 
 export {
   NEW_FOLDER,
@@ -29,7 +31,8 @@ export {
   DELETE,
   ADD_BY_PATH,
   CLI_TUTOR_MODE,
-  PINNING
+  PINNING,
+  PUBLISH
 }
 
 class Modals extends React.Component {
@@ -43,17 +46,20 @@ class Modals extends React.Component {
     pinning: {
       file: null
     },
+    publish: {
+      file: null
+    },
     delete: {
-      files: 0,
-      folder: 0,
-      paths: []
+      filesCount: 0,
+      folderCount: 0,
+      files: []
     },
     link: '',
     command: 'ipfs --help'
   }
 
-  onAddByPath = (path) => {
-    this.props.onAddByPath(path)
+  onAddByPath = (path, name) => {
+    this.props.onAddByPath(path, name)
     this.leave()
   }
 
@@ -73,10 +79,10 @@ class Modals extends React.Component {
     this.leave()
   }
 
-  delete = () => {
-    const { paths } = this.state.delete
+  delete = (args) => {
+    const { files } = this.state.delete
 
-    this.props.onDelete(paths)
+    this.props.onRemove({ files, ...args })
     this.leave()
   }
 
@@ -90,8 +96,14 @@ class Modals extends React.Component {
     this.leave()
   }
 
+  publish = async (key) => {
+    const file = this.state.publish.file
+    const cid = file.cid.toString()
+    await this.props.onPublish(cid, key)
+  }
+
   componentDidUpdate (prev) {
-    const { show, files, t, onShareLink, cliOptions } = this.props
+    const { show, files, t, onShareLink, cliOptions, root } = this.props
 
     if (show === prev.show) {
       return
@@ -129,9 +141,9 @@ class Modals extends React.Component {
         this.setState({
           readyToShow: true,
           delete: {
-            files: filesCount,
-            folders: foldersCount,
-            paths: files.map(f => f.path)
+            files,
+            filesCount,
+            foldersCount
           }
         })
         break
@@ -141,7 +153,7 @@ class Modals extends React.Component {
         this.setState({ readyToShow: true })
         break
       case CLI_TUTOR_MODE:
-        this.setState({ command: this.cliCommand(cliOptions, files) }, () => {
+        this.setState({ command: this.cliCommand(cliOptions, files, root) }, () => {
           this.setState({ readyToShow: true })
         })
         break
@@ -153,12 +165,20 @@ class Modals extends React.Component {
           pinning: { file }
         })
       }
+      case PUBLISH: {
+        const file = files[0]
+
+        return this.setState({
+          readyToShow: true,
+          publish: { file }
+        })
+      }
       default:
         // do nothing
     }
   }
 
-  cliCommand = (action, files) => {
+  cliCommand = (action, files, root) => {
     let activeCid = ''
     let fileName = ''
     let isPinned = ''
@@ -177,7 +197,9 @@ class Modals extends React.Component {
       case cliCmdKeys.ADD_DIRECTORY:
       case cliCmdKeys.CREATE_NEW_DIRECTORY:
       case cliCmdKeys.FROM_IPFS:
+        return cliCommandList[action](root.substring('/files'.length))
       case cliCmdKeys.DELETE_FILE_FROM_IPFS:
+      case cliCmdKeys.REMOVE_FILE_FROM_IPFS:
         return cliCommandList[action](path)
       case cliCmdKeys.DOWNLOAD_OBJECT_COMMAND:
         return cliCommandList[action](activeCid)
@@ -218,11 +240,11 @@ class Modals extends React.Component {
         </Overlay>
 
         <Overlay show={show === DELETE && readyToShow} onLeave={this.leave}>
-          <DeleteModal
+          <RemoveModal
             className='outline-0'
             { ...this.state.delete }
             onCancel={this.leave}
-            onDelete={this.delete} />
+            onRemove={this.delete} />
         </Overlay>
 
         <Overlay show={show === ADD_BY_PATH && readyToShow} onLeave={this.leave}>
@@ -243,6 +265,14 @@ class Modals extends React.Component {
             onCancel={this.leave}
             onPinningSet={this.onPinningSet} />
         </Overlay>
+
+        <Overlay show={show === PUBLISH && readyToShow} onLeave={this.leave}>
+          <PublishModal
+            file={this.state.publish.file}
+            className='outline-0'
+            onLeave={this.leave}
+            onSubmit={this.publish} />
+        </Overlay>
       </div>
     )
   }
@@ -256,7 +286,8 @@ Modals.propTypes = {
   onMove: PropTypes.func.isRequired,
   onMakeDir: PropTypes.func.isRequired,
   onShareLink: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
+  onRemove: PropTypes.func.isRequired,
+  onPublish: PropTypes.func.isRequired
 }
 
 export default withTranslation('files')(Modals)

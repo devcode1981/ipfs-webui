@@ -86,7 +86,7 @@ export const spawn = (type, task, ...[init]) => async (context) => {
         while (true) {
           const next = await process.next()
           if (next.done) {
-            return next.value
+            return await next.value
           } else {
             yield next.value
           }
@@ -189,7 +189,6 @@ export const sortFiles = (files, sorting) => {
  * @property {string} path
  * @property {string} realPath
  * @property {boolean} isMfs
- * @property {boolean} isPins
  * @property {boolean} isRoot
  *
  * @param {string} path
@@ -198,10 +197,9 @@ export const sortFiles = (files, sorting) => {
  */
 export const infoFromPath = (path, uriDecode = true) => {
   const info = {
-    path: path,
+    path,
     realPath: '',
     isMfs: false,
-    isPins: false,
     isRoot: false
   }
 
@@ -209,7 +207,7 @@ export const infoFromPath = (path, uriDecode = true) => {
    * @param {string} prefix
    */
   const check = (prefix) => {
-    info.realPath = info.path.substr(prefix.length).trim() || '/'
+    info.realPath = info.path.substring(prefix.length).trim() || '/'
     info.isRoot = info.realPath === '/'
   }
 
@@ -219,13 +217,6 @@ export const infoFromPath = (path, uriDecode = true) => {
   } else if (info.path.startsWith('/files')) {
     check('/files')
     info.isMfs = true
-  } else if (info.path.startsWith('/pins')) {
-    check('/pins')
-    info.isPins = true
-
-    if (info.realPath !== '/') {
-      info.realPath = `/ipfs${info.realPath}`
-    }
   } else {
     return
   }

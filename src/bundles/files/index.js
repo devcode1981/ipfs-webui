@@ -12,7 +12,7 @@ export const sorts = SORTING
  * @typedef {import('./protocol').Message} Message
  * @typedef {import('../task').SpawnState<any, Error, any, any>} JobState
  */
-export default () => {
+const createFilesBundle = () => {
   return {
     name: 'files',
 
@@ -53,19 +53,15 @@ export default () => {
           const result = task.status === 'Exit' && task.result.ok
             ? task.result.value
             : null
-          const { pageContent, pins } = result
+          const { pageContent } = result
             ? {
-              pageContent: result,
-              pins: result.type === 'directory' && result.path === '/pins'
-                ? result.content.map($ => $.cid.toString())
-                : state.pins
-            }
+                pageContent: result
+              }
             : state
 
           return {
             ...updateJob(state, task, type),
-            pageContent,
-            pins
+            pageContent
           }
         }
         case ACTIONS.DISMISS_ERRORS: {
@@ -98,22 +94,6 @@ export default () => {
             return state
           }
         }
-        case ACTIONS.PINS_SIZE_GET: {
-          const { task, type } = action
-          const pinsSize = task.status === 'Exit' && task.result.ok
-            ? task.result.value.pinsSize
-            : 0
-
-          const numberOfPins = task.status === 'Exit' && task.result.ok
-            ? task.result.value.numberOfPins
-            : 0
-
-          return {
-            ...updateJob(state, task, type),
-            pinsSize,
-            numberOfPins
-          }
-        }
         case ACTIONS.SIZE_GET: {
           const { task, type } = action
           const mfsSize = task.status === 'Exit' && task.result.ok
@@ -134,7 +114,7 @@ export default () => {
     ...selectors()
   }
 }
-
+export default createFilesBundle
 /**
  * Updates state of the given job.
  * @param {Model} state

@@ -1,32 +1,45 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { /* Trans, */ withTranslation } from 'react-i18next'
-import filesize from 'filesize'
+import { humanSize } from '../../../lib/files'
 import Button from '../../../components/button/Button'
 import Checkbox from '../../../components/checkbox/Checkbox'
 import GlyphPin from '../../../icons/GlyphPin'
+import Icon from '../../../icons/StrokePinCloud'
 import { Modal, ModalActions, ModalBody } from '../../../components/modal/Modal'
+import { complianceReportsHomepage } from '../../../constants/pinning'
 import { connect } from 'redux-bundler-react'
 import './PinningModal.css'
 
-const humanSize = (size) => {
-  if (!size) return 'N/A'
+const PinIcon = ({ icon, index }) => {
+  if (icon) {
+    return <img className="mr1" src={icon} alt='' width={32} height={32} style={{ objectFit: 'contain' }} />
+  }
 
-  return filesize(size || 0, {
-    round: size >= 1000000000 ? 1 : 0, spacer: ''
-  })
+  const colors = ['aqua', 'link', 'yellow', 'teal', 'red', 'green', 'navy', 'gray', 'charcoal']
+  const color = colors[index % colors.length]
+  const glyphClass = `mr1 fill-${color} flex-shrink-0`
+
+  return <GlyphPin width={32} height={32} className={glyphClass}/>
 }
 
-export const PinningModal = ({ t, tReady, onCancel, onPinningSet, file, availablePinningServices, doGetFileSizeThroughCid, doSelectRemotePinsForFile, className, ...props }) => {
-  const remoteServices = useMemo(() => doSelectRemotePinsForFile(file), [doSelectRemotePinsForFile, file])
-  const [selectedServices, setSelectedServices] = useState([...remoteServices, ...[file.pinned && 'local']])
+export const PinningModal = ({ t, tReady, onCancel, onPinningSet, file, pinningServices, remotePins, notRemotePins, pendingPins, doGetFileSizeThroughCid, doSelectRemotePinsForFile, doFetchPinningServices, doFetchRemotePins, className, ...props }) => {
+  const selectedRemoteServices = useMemo(() => doSelectRemotePinsForFile(file, remotePins, notRemotePins, pendingPins), [doSelectRemotePinsForFile, file, remotePins, notRemotePins, pendingPins])
+  const [selectedServices, setSelectedServices] = useState([...selectedRemoteServices, ...[file.pinned && 'local']])
   const [size, setSize] = useState(null)
 
   useEffect(() => {
+    doFetchPinningServices()
     const fetchSize = async () => setSize(await doGetFileSizeThroughCid(file.cid))
     fetchSize()
+    doFetchRemotePins([{ cid: file.cid }])
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [file])
+
+  useEffect(() => {
+    // Trigger status check for services without cached result
+    setSelectedServices([...selectedRemoteServices, ...[file.pinned && 'local']])
+  }, [file, selectedRemoteServices])
 
   const selectService = (key) => {
     if (selectedServices.indexOf(key) === -1) {
@@ -35,20 +48,21 @@ export const PinningModal = ({ t, tReady, onCancel, onPinningSet, file, availabl
 
     return setSelectedServices(selectedServices.filter(s => s !== key))
   }
+
   return (
     <Modal {...props} className={className} onCancel={onCancel} >
-      <ModalBody title={t('pinningModal.title')}>
+      <ModalBody title={t('pinningModal.title')} Icon={Icon}>
         <div className="pinningModalContainer">
           <button className="flex items-center pa1 hoverable-button" key={t('pinningModal.localNode')} onClick={() => selectService('local')}>
             <Checkbox className='pv3 pl3 pr1 flex-none' checked={selectedServices.includes('local')} style={{ pointerEvents: 'none' }}/>
             <GlyphPin fill="currentColor" width={32} height={32} className="mr1 aqua flex-shrink-0"/>
             <p className="f5 w-100">{ t('pinningModal.localNode') }</p>
           </button>
-          { availablePinningServices.map(({ icon, name }) => (
+          { pinningServices.map(({ icon, name }, index) => (
             <button className="flex items-center pa1 hoverable-button" key={name} onClick={() => selectService(name)}>
               <Checkbox className='pv3 pl3 pr1 flex-none' checked={selectedServices.includes(name)} style={{ pointerEvents: 'none' }}/>
-              <img className="mr1" src={icon} alt='' width={32} height={32} style={{ objectFit: 'contain' }} />
-              <p className="f5">{ name }</p>
+              <PinIcon index={index} icon={icon}/>
+              <p className='f5'>{ name }</p>
             </button>
           ))}
         </div>
@@ -57,12 +71,13 @@ export const PinningModal = ({ t, tReady, onCancel, onPinningSet, file, availabl
             Need to add or configure a pinning service? Go to <a href="#/settings" className="link blue">Settings.</a>
           </Trans>
         </p> */}
+        <a className="mb1 tl f7 charcoal-muted no-underline underline-hover" target="_blank" rel="noreferrer" href={complianceReportsHomepage}>{ t('pinningModal.complianceLabel') }</a>
         <p className="f6 charcoal">{t('pinningModal.totalSize', { size: humanSize(size) })}</p>
       </ModalBody>
 
       <ModalActions>
         <Button className='ma2 tc' bg='bg-gray' onClick={onCancel}>{t('app:actions.cancel')}</Button>
-        <Button className='ma2 tc' bg='bg-teal' onClick={() => onPinningSet(file.cid, selectedServices)}>{t('app:actions.apply')}</Button>
+        <Button className='ma2 tc' bg='bg-teal' onClick={() => onPinningSet(file, selectedServices, file.pinned, selectedRemoteServices)}>{t('app:actions.apply')}</Button>
       </ModalActions>
     </Modal>
   )
@@ -72,8 +87,7 @@ PinningModal.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onPinningSet: PropTypes.func.isRequired,
   t: PropTypes.func.isRequired,
-  file: PropTypes.object,
-  tReady: PropTypes.bool
+  file: PropTypes.object.isRequired
 }
 
 PinningModal.defaultProps = {
@@ -81,8 +95,13 @@ PinningModal.defaultProps = {
 }
 
 export default connect(
-  'selectAvailablePinningServices',
+  'selectPinningServices',
+  'selectRemotePins',
+  'selectPendingPins',
+  'selectNotRemotePins',
   'doSelectRemotePinsForFile',
   'doGetFileSizeThroughCid',
+  'doFetchPinningServices',
+  'doFetchRemotePins',
   withTranslation('files')(PinningModal)
 )

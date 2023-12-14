@@ -2,7 +2,7 @@ import { createSelector } from 'redux-bundler'
 import last from 'it-last'
 
 // Depends on ipfsBundle, peersBundle, routesBundle
-export default function (opts) {
+const bundle = function (opts) {
   opts = opts || {}
   // Max number of peers to update at once
   opts.peerUpdateConcurrency = opts.peerUpdateConcurrency || 5
@@ -69,7 +69,7 @@ export default function (opts) {
         const now = Date.now()
         return {
           ...state,
-          now: now, // Pick up another peer if possible
+          now, // Pick up another peer if possible
           peers: state.peers.map(p => {
             if (p.id !== action.payload.peerId) return p
             return {
@@ -180,3 +180,5 @@ export default function (opts) {
     )
   }
 }
+
+export default bundle

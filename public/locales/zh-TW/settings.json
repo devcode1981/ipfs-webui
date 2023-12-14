@@ -1,37 +1,104 @@
 {
-  "title": "設置",
+  "title": "設定",
+  "save": "儲存",
+  "saving": "正在儲存…",
+  "reset": "重設",
+  "learnMoreLink": "了解更多。",
+  "showOptions": "Show options",
+  "pinningServices": {
+    "title": "錨釘服務",
+    "description": "當您希望即使刪除了檔案也希望確保您節點上的項目永遠不會被執行垃圾回收時可以使用本機錨釘。您也能夠將自動地將您的帳號與其他遠端錨定服務連結在一起，或是挑選重要檔案與那些錨釘服務提供者合作以保留檔案副本使其即使在您自己的本機節點關閉時也能夠長期存活",
+    "noPinRemoteDescription": "Support for third-party remote pinning services is missing. Update your IPFS node to Kubo 0.8.0 or later, and you'll be able to add and configure them here.",
+    "addAutoUpload": "啟動自動上傳",
+    "removeAutoUpload": "禁止自動上傳"
+  },
   "language": "語言",
   "analytics": "分析",
-  "cliTutorMode": "CLI Tutor Mode",
-  "config": "IPFS 設置",
+  "cliTutorMode": "CLI 引導模式",
+  "config": "IPFS 設定",
   "languageModal": {
-    "title": "修改語言",
-    "description": "選擇首選語言。",
-    "translationProjectIntro": "Add or improve translations and make IPFS better for everyone!",
-    "translationProjectLink": "Join the IPFS Translation Project"
+    "title": "變更語言",
+    "description": "挑選你喜好的語言。",
+    "translationProjectIntro": "新增或改進翻譯，使 IPFS 更適合每個人！",
+    "translationProjectLink": "加入 IPFS 翻譯專案"
   },
-  "apiDescription": "<0>If your node is configured with a <1>custom API address</1>, including a port other than the default 5001, enter it here.</0>",
-  "cliDescription": "<0>Enable this option to display a \"view code\" <1></1> icon next to common IPFS commands. Clicking it opens a modal with that command's CLI code, so you can paste it into the IPFS command-line interface in your terminal.</0>",
-  "fetchingSettings": "讀取設置中...",
-  "configApiNotAvailable": "IPFS 設置API 不可用。請勿用\"IPFS 伴侶\" 瀏覽器插件並重試。",
-  "ipfsDaemonOffline": "IPFS Daemon處於離線狀態。請使其在線並重試。",
-  "settingsUnavailable": "設置不可用。請檢查你的IPFS Daemon是否還在運行。",
-  "settingsHaveChanged": "設置已經改變，請單擊<1>重置</1> 按鈕刷新編輯器中的內容。",
-  "errorOccured": "在保存修改的設置文件過程中出錯",
-  "checkConsole": "請查看瀏覽器控制台了解更多的信息。",
-  "changesSaved": "你修改的設置已經保存。",
-  "settingsWillBeUsedNextTime": "新的設置信息會在你下次重新啟動IPFS Daemon後生效。",
-  "ipfsConfigDescription": "IPFS 設置文件是一個JSON 文件。 IPFS Daemon會在啟動過程中讀取一次。保存修改的設置，重啟IPFS Daemon後使用你修改後的設置。",
-  "ipfsConfigHelp": "檢查文檔查看更多信息",
+  "apiDescription": "<0>如果您的節點配置了一個<1>自定義的 API 位址</1>，或者包含了其他非預設的 5001 埠號的情況下，請於此處修改。</0>",
+  "publicGatewayDescription": "<0>Choose which <1>public gateway</1> you want to use when generating shareable links.</0>",
+  "cliDescription": "<0>啟用此選項可在常用 IPFS 指令旁顯示<1>“查看程式碼”</1>的圖示。點選後會開啟一個帶有該指令的 CLI 視窗，因此您可以將其複製貼上到終端機的 IPFS 指令界面中。</0>",
+  "cliModal": {
+    "extraNotesJsonConfig": "如果您希望保存已在此頁的程式編輯器中修改過的設置，點擊複製圖示旁的下載圖示可以將設置文件以 JSON 檔案的形式下載到本機。"
+  },
+  "pinningModal": {
+    "title": "請選擇一個錨釘服務提供者。",
+    "description": "沒有看到您的錨釘服務提供者？<1>於此處新增。</1>"
+  },
+  "pinningServiceModal": {
+    "title": "配置一個自定義的錨釘服務",
+    "description": "您想要創建一個可以替他人提供的固定服務嗎？<0>學習如何創建</0>",
+    "service": "服務",
+    "nickname": "暱稱",
+    "nicknamePlaceholder": "您的服務名稱",
+    "apiEndpoint": "API 終端節點",
+    "apiEndpointPlaceholder": "這個 API 終端節點的 URL",
+    "secretApiKey": "加密 token",
+    "secretApiKeyHowToLink": "如何生成一個新的 token",
+    "autoUpload": "自動上傳",
+    "complianceLabel": "🔍 {nickname} pinning compliance report"
+  },
+  "autoUploadModal": {
+    "title": "替{name}更改上傳策略",
+    "description": "當啟用時，自動上傳將定期錨釘您的檔案根目錄，以確保即使您的本機 IPFS 節點離線時也將所有檔案都錨釘到運行中的遠端錨釘節點。若禁用時，\n您也可以在檔案頁面上方的 \"設定錨釘\" 選項中進行個別檔案的手動錨釘。"
+  },
+  "errors": {
+    "nickname": "需要填寫暱稱",
+    "apiError": "API 錯誤",
+    "apiEndpoint": "需要為一個有效的 URL",
+    "secretApiKey": "需要輸入一個加密 token",
+    "failedToFetch": "無法取得",
+    "failedToFetchTitle": "無法從遠端服務中得到已錨釘的數量。請確認該服務是否運作中或是輸入的憑證是正確的。若這是一個新加入的服務，請嘗試刪除並重新新增。"
+  },
+  "actions": {
+    "addService": "新增服務",
+    "generateKey": "Generate Key",
+    "edit": "變更",
+    "close": "關閉",
+    "save": "儲存",
+    "cancel": "取消",
+    "enable": "啟用",
+    "disable": "停用"
+  },
+  "edit": "編輯",
+  "visitService": "訪問服務",
+  "remove": "移除",
+  "localPinning": "本機錨釘",
+  "service": "服務",
+  "size": "大小",
+  "pins": "錨釘",
+  "autoUpload": "自動上傳",
+  "autoUploadPolicy": {
+    "true": "所有檔案",
+    "false": "關閉"
+  },
+  "fetchingSettings": "正在擷取設定...",
+  "configApiNotAvailable": "IPFS 設定 API 無法使用。請停用「IPFS 小幫手」網頁擴充功能並再試一次。",
+  "ipfsDaemonOffline": "IPFS Daemon 已離線。請開啟並再試一次。",
+  "settingsUnavailable": "設定無法使用。請檢查你的 IPFS Daemon 是否正在執行。",
+  "settingsHaveChanged": "設定已經變更，請按<1>重設</1> 更新編輯器內容。",
+  "errorOccured": "在儲存變更時發生錯誤",
+  "checkConsole": "檢查瀏覽器主控台獲知更多資訊。",
+  "changesSaved": "你的變更已經儲存。",
+  "settingsWillBeUsedNextTime": "新設定將在你下次重新啟動 IPFS Daemon 後使用。",
+  "ipfsConfigDescription": "IPFS 設定檔是一個 JSON 文件。 IPFS Daemon 將在啟動過程中讀取一次。儲存你的變更，重新啟動 IPFS Daemon 後套用這些設定。",
+  "ipfsConfigHelp": "檢查文件獲知進一步資訊",
   "AnalyticsToggle": {
     "label": "向我們提供匿名數據來幫助我們改進",
-    "summary": "設置收集哪些數據",
+    "summary": "設定收集哪些資料",
     "paragraph1": "不會收集任何CID 、文件名或個人信息。我們收集度量數據來幫助我們優化後續工作的優先級，並且收集系統設置信息引導我們進行測試。",
     "paragraph2": "Protocol Labs 運行了<1>Countly</1> 實例幫助我們收集這個應用產生的匿名數據。",
     "basicInfo": "下列數據會發送到countly.ipfs.io",
     "optionalInfo": "你可以選擇發送下列數據：",
     "sessions": {
-      "label": "會話",
+      "label": "工作階段",
       "summary": "何時使用了此應用，使用了多長時間，以及相關的瀏覽器度量值。",
       "details": "<0>將會發送下列瀏覽器度量數據：</0><1><0>隨機產生的設備ID</0><1>會話開始時的時間戳</1>< 2>用於跟踪持續時間的定期時間戳</2><3>應用版本，例如：2.4.4</3><4>語言環境，例如zh-TW</4><5>用戶瀏覽器版本，例如Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) …</5><6>螢幕分辨率，例如800×600</6><7>螢幕像素密度，例如1</7></ 1>"
     },
@@ -51,43 +118,67 @@
       "details": "您的IP地址用於計算您所在位置的國家/地區代碼，例如法國的\"FR\" 。 如果沒有給予跟踪位置的同意，則發送空位置屬性，其中所有請求都向服務器發出信號以禁用位置查找。 這些信息有助於指導我們的翻譯工作，並找出我們應該在哪些方面展示活動。"
     },
     "crashes": {
-      "label": "應用錯誤",
+      "label": "應用程式錯誤",
       "summary": "JavaScript 錯誤消息和堆疊跟踪",
       "details": "記錄盡可能使用應用程序時出現的JavaScript 錯誤消息和堆疊跟踪。 了解應用程序何時不適合您，但<1>錯誤消息可能包含可識別信息</ 1>（如CID 或文件路徑）非常有用，因此，只有在您願意與我們共享該信息時才啟用此信息。"
     }
   },
   "cliToggle": {
-    "label": "Enable command-line interface (CLI) tutor mode"
+    "label": "啟用指令介面（CLI）引導模式"
   },
   "tour": {
     "step1": {
-      "title": "設置頁面",
-      "paragraph1": "您可以在此處更改Web UI 和IPFS 節點的設置。",
+      "title": "設定頁面",
+      "paragraph1": "您可以在這裡變更 Web UI 和 IPFS 節點的設定。",
       "paragraph2": "如果你正在運行IPFS Desktop ，會有一些特定的設置。"
     },
     "step2": {
+      "title": "自定義 API 位址",
+      "paragraph1": "如果您為 IPFS 節點配置了自定義的 API 位址，您可以直接在這裡更新設置而不需要手動修改 JSON 設定檔。"
+    },
+    "step3": {
+      "title": "正在錨釘服務",
+      "paragraph1": "<0>如果您有第三方遠程固定服務的帳號，請於此處新增。這樣您可以在這個檔案頁面直接進行遠程錨釘或取消錨釘檔案的操作。您可以在<1> IPFS Docs<1> 中得到解到更多有關第三方錨釘服務的詳細說明。<0>"
+    },
+    "step4": {
       "title": "語言選擇器",
       "paragraph1": "<0>您可以更改Web UI 的語言設置。如果您的首選語言不可用，請訪問<1>Transifex</1> 中的項目頁面以幫助我們翻譯！</0>"
     },
-    "step3": {
+    "step5": {
       "title": "匿名化的使用分析",
       "paragraph1": "如果您選擇加入，您可以通過發送匿名化的使用情況分析來幫助我們改善Web UI。",
       "paragraph2": "您可以選擇向我們發送的數據。我們非常重視隱私，所採集的數據無法識別您的身份。"
     },
-    "step4": {
-      "title": "Custom API address",
-      "paragraph1": "If you've configured your IPFS node with a custom API address, you can update your config file right here instead of editing the JSON by hand."
+    "step6": {
+      "title": "CLI 引導模式",
+      "paragraph1": "啟用CLI 引導模式來查看常見 IPFS 指令 — 若您正在學習如何透過中終端機使用 IPFS，或者您只是需要查詢指令，這將非常有用。"
     },
-    "step5": {
-      "title": "IPFS 設置",
+    "step7": {
+      "title": "IPFS 設定",
       "paragraph1": "您可以直接從Web UI 更改IPFS 節點的設置！",
       "paragraph2": "不要忘記重新啟動守護程式以應用更改。"
     }
   },
   "Experiments": {
     "description": "在這裡，您可以通過下面的觸發選項獲得使用早期預覽版IPFS 功能的身份。 我們正在測試這些想法，但它們可能還不完美，所以我們很樂意聽取您的反饋意見。",
-    "issueUrl": "提交bug",
-    "feedbackUrl": "💌提供反饋",
-    "readMoreUrl": "查看更多"
+    "issueUrl": "回報臭蟲",
+    "feedbackUrl": "💌留下意見",
+    "readMoreUrl": "閱讀更多"
+  },
+  "ipnsPublishingKeys": {
+    "title": "IPNS Publishing Keys",
+    "description": "The InterPlanetary Name System (IPNS) provides cryptographic addresses for publishing updates to content that is expected to change over time. This feature requires your node to be online at least once a day to ensure IPNS records are kept alive on the public DHT."
+  },
+  "generateKeyModal": {
+    "title": "Generate New IPNS Key",
+    "description": "Enter a nickname for this key to generate:"
+  },
+  "renameKeyModal": {
+    "title": "Rename Key",
+    "description": "Enter a new nickname for the IPNS key <1>{name}</1>."
+  },
+  "removeKeyModal": {
+    "title": "Confirm IPNS Key Removal",
+    "description": "Are you sure you want to delete the IPNS key <1>{name}</1>? This operation can't be undone, and the IPNS address managed by this key will be lost FOREVER. Consider backing it up first: ipfs key export --help"
   }
 }

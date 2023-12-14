@@ -4,20 +4,25 @@
   "breadcrumbs": "Breadcrumbs",
   "finished": "Fertig!",
   "totalSize": "Gesamtgröße: {size}",
-  "filesSelected": "{count, plural, one {Datei ausgewählt} other {Dateien ausgewählt}}",
+  "filesSelected": "{count, plural, one {Element ausgewählt} other {Elemente ausgewählt}}",
   "menuOptions": "Optionen für das ausgewählte Element",
   "selectedAllEntries": "Alle Tabelleneinträge auswählen",
   "individualFilesOnly": "Nur für individuelle Dateien verfügbar",
   "noPDFSupport": "Dein Browser unterstützt keine PDFs. Bitte lade das PDF herunter, um es anzusehen:",
-  "downloadPDF": "PDF herunterladen.",
-  "downloadInstead": "Versuche stattdessen, es <1>herunterzuladen</1>.",
+  "downloadPDF": "PDF herunterladen",
+  "openWithPublicGateway": "Versuche es stattdessen mit Deinem <1>öffentlichen Gateway</1> zu öffnen.",
+  "openWithLocalAndPublicGateway": "Versuche es stattdessen mit Deinem <1>lokalen Gateway</1> oder <3>öffentlichen Gateway</3> zu öffnen.",
   "cantBePreviewed": "Für diese Datei ist keine Vorschau verfügbar",
   "addByPath": "Aus IPFS",
   "newFolder": "Neuer Ordner",
   "generating": "Erstelle…",
   "actions": {
     "copyHash": "CID kopieren",
-    "share": "Link teilen"
+    "share": "Link teilen",
+    "publishWithIpns": "Im IPNS veröffentlichen"
+  },
+  "cliModal": {
+    "extraNotesPinning": "Dieser Befehl ist nur zum lokalen Anheften/Loslösen vorgesehen. Wenn du einen Remote-Pinning-Dienst verwenden möchten, lies die Dokumentation dieses Dienstes, um zu erfahren, wie du über die Kommandozeile etwas anheften/loslösen kannst."
   },
   "shareModal": {
     "title": "Dateien teilen",
@@ -29,17 +34,28 @@
     "descriptionFile": "Wähle einen neuen Namen für diese Datei.",
     "descriptionFolder": "Wähle einen neuen Namen für diesen Ordner."
   },
-  "deleteModal": {
-    "titleItem": "{count, plural, one {Element löschen} other {{count} Elemente löschen}}",
-    "titleFolder": "{count, plural, one {Ordner löschen} other {{count} Ordner löschen}}",
-    "titleFile": "{count, plural, one {Datei löschen} other {{count} Dateien löschen}}",
-    "descriptionItem": "{count, plural, one {Bist Du sicher, dass Du dieses Element löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.} other {Bist Du sicher, dass Du diese {count} Elemente löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.}}",
-    "descriptionFolder": "{count, plural, one {Bist Du sicher, dass Du diesen Ordner löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.} other {Bist Du sicher, dass Du diese {count} Ordner löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.}}",
-    "descriptionFile": "{count, plural, one {Bist Du sicher, dass Du diese Datei löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.} other {Bist Du sicher, dass Du diese {count} Dateien löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.}}"
+  "removeModal": {
+    "titleItem": "{count, plural, one {Element {name} entfernen?} other {{count} Elemente entfernen?}}",
+    "titleFolder": "{count, plural, one {Ordner {name} löschen?} other {{count} Ordner löschen?}}",
+    "titleFile": "{count, plural, one {Datei {name} entfernen?} other {{count} Dateien entfernen?}}",
+    "descriptionItem": "{count, plural, one {Möchtest du dieses Element wirklich entfernen? Es wird nicht mehr auf der Dateien-Seite angezeigt und bei der nächsten geplanten Bereinigung dauerhaft entfernt (obwohl möglicherweise Kopien auf anderen IPFS-Knoten vorhanden sind). Diese Aktion kann nicht rückgängig gemacht werden.} other {Möchtest du diese {count} Elemente wirklich entfernen? Sie werden nicht mehr auf der Dateien-Seite angezeigt und bei der nächsten geplanten Bereinigung dauerhaft entfernt (obwohl möglicherweise Kopien auf anderen IPFS-Knoten vorhanden sind). Diese Aktion kann nicht rückgängig gemacht werden.}}",
+    "descriptionFolder": "{count, plural, one {Möchtest du diesen Ordner wirklich entfernen? Er wird nicht mehr auf der Dateien-Seite angezeigt und bei der nächsten geplanten Bereinigung dauerhaft entfernt (obwohl möglicherweise Kopien auf anderen IPFS-Knoten vorhanden sind). Diese Aktion kann nicht rückgängig gemacht werden.} other {Möchtest du diese {count} Ordner wirklich entfernen? Sie werden nicht mehr auf der Dateien-Seite angezeigt und bei der nächsten geplanten Bereinigung dauerhaft entfernt (obwohl möglicherweise Kopien auf anderen IPFS-Knoten vorhanden sind). Diese Aktion kann nicht rückgängig gemacht werden.}}",
+    "descriptionFile": "{count, plural, one {Möchtest du diese Datei wirklich entfernen? Sie wird nicht mehr auf der Dateien-Seite angezeigt und bei der nächsten geplanten Bereinigung dauerhaft entfernt (obwohl möglicherweise Kopien auf anderen IPFS-Knoten vorhanden sind). Diese Aktion kann nicht rückgängig gemacht werden.} other {Möchtest du diese {count} Dateien wirklich entfernen? Sie werden nicht mehr auf der Dateien-Seite angezeigt und bei der nächsten geplanten Bereinigung dauerhaft entfernt (obwohl möglicherweise Kopien auf anderen IPFS-Knoten vorhanden sind). Diese Aktion kann nicht rückgängig gemacht werden.}}",
+    "checkboxRemoveLocalPin": "Auch den lokalen Pin entfernen (empfohlen)",
+    "checkboxUnpinFromServices": "Von allen Pinning-Diensten loslösen"
+  },
+  "pinningModal": {
+    "title": "Wähle aus, wo du diese Elemente anheften möchtest.",
+    "complianceLabel": "Prüfe die Compliance vom Pinning-Service",
+    "footer": "Du möchtest einen Pinning-Dienst hinzufügen oder konfigurieren? Gehe zu <1>Einstellungen</1>.",
+    "localNode": "Lokaler Knoten",
+    "totalSize": "Gesamtgröße: {size}"
   },
   "addByPathModal": {
     "title": "Aus IPFS importieren",
-    "description": "Tragen Sie einen IPFS Pfad (CID) zum Importieren ein.",
+    "description": "Gib einen IPFS Pfad (CID) zum Importieren ein.",
+    "importPathPlaceholder": "Pfad oder CID (erforderlich)",
+    "namePlaceholder": "Name (optional)",
     "examples": "Beispiele:"
   },
   "newFolderModal": {
@@ -57,11 +73,11 @@
     "closeDropdown": "Dropdown schließen",
     "count": "{count} von {count}"
   },
-  "addFilesInfo": "<0>Noch keine Dateien vorhanden! Füge Dateien zu deinem IPFS-Node hinzu, indem du oben auf die Schaltfläche <1>\"Importieren\"</1> klickst.</0>",
+  "addFilesInfo": "<0>Noch keine Dateien vorhanden! Füge Dateien zu deinem IPFS-Knoten hinzu, indem du oben auf die Schaltfläche <1>\"Importieren\"</1> klickst.</0>",
   "companionInfo": "<0>Da du den <1>IPFS Companion</1> nutzt, ist die Dateiansicht auf Dateien begrenzt, die während der Nutzung der Erweiterung hinzugefügt wurden.</0>",
   "tour": {
     "step1": {
-      "title": "Datei Seite",
+      "title": "Dateien-Seite",
       "paragraph1": "<0>Hier leben die Dateien deines <1>veränderbaren Dateisystems (MFS)</1>. Du kannst Dateien oder Ordner hinzufügen und sie von dieser Seite aus verwalten.</0>",
       "paragraph2": "Klicke \"Weiter\", um mehr zu erfahren."
     },
@@ -76,12 +92,12 @@
       "title": "Dateien hinzufügen",
       "paragraph1": "Hier kannst du sehen, wie viele Blöcke und Dateien du angepinnt hast.",
       "paragraph2": "Du kannst Dateien oder Ordner mit dem Dropdown auf der rechten Seite zu deiner Ablage hinzufügen.",
-      "paragraph3": "<0>Wenn du etwas, was schon in IPFS ist, hinzufügen möchtest, kannst du es in dein MFS importieren, indem du dessen <1>Inhalts-Bezeichner (CID)</1> einträgst.</0>"
+      "paragraph3": "<0>Wenn du etwas, was schon in IPFS ist, hinzufügen möchtest, kannst du es in dein MFS importieren, indem du dessen <1>Content Identifier (CID)</1> angibst.</0>"
     },
     "step5": {
       "title": "Datei Liste",
-      "paragraph1": "Schließlich, die Liste mit allen Dateien und Ordnern. Füge Dateien und Ordner mit Drag and Drop hinzu.",
-      "paragraph2": "Du kannst Dateien teilen oder herunterladen, sie in dem IPLD Explorer untersuchen, sie umbenennen oder löschen!",
+      "paragraph1": "Schließlich die Liste mit allen Dateien und Ordnern. Füge Dateien und Ordner mit Drag and Drop hinzu.",
+      "paragraph2": "Du kannst Dateien teilen oder herunterladen, sie in dem IPLD Explorer untersuchen, sie umbenennen oder entfernen!",
       "paragraph3": "Profi-Tipp: Ziehe eine Datei von jeder anderen Seite der Web-UI hierher, um sie zum Wurzel-Verzeichnis deines MFS hinzuzufügen."
     }
   },
@@ -90,7 +106,32 @@
   "fileLabel": "Wähle {type}{name} mit Größe: {size} ",
   "hashUnavailable": "Hash nicht verfügbar",
   "checkboxLabel": "Weitere Optionen für {name} anzeigen",
-  "pinned": "Gepinned",
-  "cidNotFileNorDir": "Der aktuelle Link ist weder eine Datei, noch ein Verzeichnis. Versuche stattdessen, es zu <0>untersuchen</0>.",
-  "sortBy": "Sortieren nach {name}"
+  "pinned": "Angeheftet",
+  "pinnedRemotely": "Entfernt angeheftet",
+  "pinningRemotely": "Pinning remotely",
+  "pinningCompleted": "Pinning completed",
+  "pinningFailed": "Pinning failed",
+  "clickToDismiss": "Click to dismiss",
+  "clickToCancel": "Click to cancel",
+  "blocks": "Blöcke",
+  "allBlocks": "Alle Blöcke",
+  "allBlocksDescription": "Die Gesamtgröße aller Blöcke auf deinem IPFS Knoten; Dies umfasst alles in Dateien, sowie alle lokal angehefteten Elemente und alle temporär gespeicherten Daten",
+  "filesDescription": "Gesamtgröße der Daten im aktuellen Verzeichnis (wenn es sich um ein Unterverzeichnis handelt, wird auch die Größe aller Daten in Dateien angezeigt)",
+  "pinningQueue": "Pinning queue",
+  "more": "Mehr",
+  "files": "Dateien",
+  "cidNotFileNorDir": "Der aktuelle Link ist weder eine Datei, noch ein Verzeichnis. Versuche stattdessen, es zu <1>untersuchen</1>.",
+  "sortBy": "Sortieren nach {name}",
+  "publishModal": {
+    "title": "Im IPNS veröffentlichen",
+    "cidToPublish": "CID:",
+    "publishUnderKey": "Wähle Schlüssel zum Veröffentlichen:",
+    "help": "Gehe zu den Einstellungen um über IPNS zu lernen und erstelle mehr Schlüssel.",
+    "publishedUnderKey": "Erfolgreich unter dem Schlüssel veröffentlicht:",
+    "linkCopied": "Link kopiert!",
+    "sharingPrompt": "Kopieren den untenstehenden Link und teile ihn mit anderen. Die IPNS-Adresse wird aufgelöst, so lange dein Node mindestes ein Mal täglich im Netzwerk verfügbar ist, um den IPNS-Record zu erneuern.",
+    "pleaseWait": "Bitte warte solange die initialen 20 Kopien des geänderten IPNS-Records mit der Hilfe von DHT-Peers gespeichert wurde ..."
+  },
+  "noPinsInProgress": "All done, no remote pins in progress.",
+  "remotePinningInProgress": "Remote pinning in progress:"
 }

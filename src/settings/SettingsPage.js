@@ -13,8 +13,10 @@ import Box from '../components/box/Box'
 import Button from '../components/button/Button'
 import LanguageSelector from '../components/language-selector/LanguageSelector'
 import PinningManager from '../components/pinning-manager/PinningManager'
+import IpnsManager from '../components/ipns-manager/IpnsManager'
 import AnalyticsToggle from '../components/analytics-toggle/AnalyticsToggle'
 import ApiAddressForm from '../components/api-address-form/ApiAddressForm'
+import PublicGatewayForm from '../components/public-gateway-form/PublicGatewayForm'
 import JsonEditor from './editor/JsonEditor'
 import Experiments from '../components/experiments/ExperimentsPanel'
 import Title from './Title'
@@ -27,8 +29,8 @@ import { cliCmdKeys, cliCommandList } from '../bundles/files/consts'
 const PAUSE_AFTER_SAVE_MS = 3000
 
 export const SettingsPage = ({
-  t, tReady, isIpfsConnected, ipfsPendingFirstConnection,
-  isConfigBlocked, isLoading, isSaving,
+  t, tReady, isIpfsConnected, ipfsPendingFirstConnection, isIpfsDesktop,
+  isConfigBlocked, isLoading, isSaving, arePinningServicesSupported,
   hasSaveFailed, hasSaveSucceded, hasErrors, hasLocalChanges, hasExternalChanges,
   config, onChange, onReset, onSave, editorKey, analyticsEnabled, doToggleAnalytics,
   toursEnabled, handleJoyrideCallback, isCliTutorModeEnabled, doToggleCliTutorMode, command
@@ -44,31 +46,48 @@ export const SettingsPage = ({
     { ipfsPendingFirstConnection
       ? <div className="absolute flex items-center justify-center w-100 h-100"
         style={{ background: 'rgba(255, 255, 255, 0.5)', zIndex: '10' }}>
-        <ComponentLoader pastDelay />
+        <ComponentLoader />
       </div>
       : null }
 
-    <Box className='mb3 pa4-l pa2 joyride-settings-customapi'>
+    { isIpfsDesktop
+      ? null
+      : <Box className='mb3 pa4-l pa2 joyride-settings-customapi'>
+        <div className='lh-copy charcoal'>
+          <Title>{t('app:terms.apiAddress')}</Title>
+          <Trans i18nKey='apiDescription' t={t}>
+            <p>If your node is configured with a <a className='link blue' href='https://github.com/ipfs/kubo/blob/master/docs/config.md#addresses' target='_blank' rel='noopener noreferrer'>custom API address</a>, including a port other than the default 5001, enter it here.</p>
+          </Trans>
+          <ApiAddressForm/>
+        </div>
+      </Box> }
+
+    <Box className='mb3 pa4-l pa2'>
       <div className='lh-copy charcoal'>
-        <Title>{t('app:terms.apiAddress')}</Title>
-        <Trans i18nKey='apiDescription' t={t}>
-          <p>If your node is configured with a <a className='link blue' href='https://github.com/ipfs/go-ipfs/blob/master/docs/config.md#addresses' target='_blank' rel='noopener noreferrer'>custom API address</a>, including a port other than the default 5001, enter it here.</p>
+        <Title>{t('app:terms.publicGateway')}</Title>
+        <Trans i18nKey='publicGatewayDescription' t={t}>
+          <p>Choose which <a className='link blue' href="http://docs.ipfs.io/concepts/ipfs-gateway/#public-gateways" target='_blank' rel='noopener noreferrer'>public gateway</a> you want to use to open your files.</p>
         </Trans>
-        <ApiAddressForm/>
+        <PublicGatewayForm/>
       </div>
     </Box>
 
     <Box className='mb3 pa4-l pa2'>
-      <Title>{t('pinningServices.title')}</Title>
-      {/* <Trans i18nKey='pinningServices.description'>
-        <p className='ma0 mr2 lh-copy charcoal f6'>
-          <span>Use local pinning when you want to ensure an item on your node is never garbage-collected, even if you remove it from Files.
-          You can also link your accounts with other remote pinning services to automatically or selectively persist files with those providers, enabling you to keep backup copies of your files and/or make them available to others when your local node is offline. </span>
-          <a className='link' href='https://ipfs.io'>Check the documentation for further information.</a>
-        </p>
-      </Trans> */}
-      <p className='ma0 mr2 lh-copy charcoal f6'>{t('pinningServices.description')}</p>
+      <Title>{t('ipnsPublishingKeys.title')}</Title>
+      <p className='ma0 mr2 lh-copy charcoal f6'>
+        {t('ipnsPublishingKeys.description')}&nbsp;<a className='link blue' target='_blank' rel='noopener noreferrer' href='https://docs.ipfs.io/concepts/glossary/#ipns'>{t('learnMoreLink')}</a>
+      </p>
+      <IpnsManager t={t} />
+    </Box>
 
+    <Box className='mb3 pa4-l pa2 joyride-settings-pinning'>
+      <Title>{t('pinningServices.title')}</Title>
+      <p className='ma0 mr2 lh-copy charcoal f6'>
+        { arePinningServicesSupported
+          ? t('pinningServices.description')
+          : t('pinningServices.noPinRemoteDescription')
+        }&nbsp;<a className='link blue' target='_blank' rel='noopener noreferrer' href='https://docs.ipfs.io/how-to/work-with-pinning-services/'>{t('learnMoreLink')}</a>
+      </p>
       <PinningManager t={t} />
     </Box>
 
@@ -86,7 +105,7 @@ export const SettingsPage = ({
 
     <Experiments t={t} />
 
-    <Box className='mb3 pa4-l pa2'>
+    <Box className='mb3 pa4-l pa2 joyride-settings-tutormode'>
       <div className='charcoal'>
         <Title>{t('cliTutorMode')}</Title>
         <Checkbox className='dib' onChange={doToggleCliTutorMode} checked={isCliTutorModeEnabled}
@@ -98,55 +117,61 @@ export const SettingsPage = ({
     </Box>
 
     { isIpfsConnected &&
-    (<Box className='mb3 pa4-l pa2 joyride-settings-config'>
-      <Title>{t('config')}</Title>
-      <div className='flex pb3'>
-        <div className='flex-auto'>
-          <div className='mw7'>
-            <SettingsInfo
-              t={t}
-              tReady={tReady}
-              config={config}
-              isIpfsConnected={isIpfsConnected}
-              isConfigBlocked={isConfigBlocked}
-              isLoading={isLoading}
-              hasExternalChanges={hasExternalChanges}
-              hasSaveFailed={hasSaveFailed}
-              hasSaveSucceded={hasSaveSucceded} />
+    (<Box className='mb3 pa4-l pa2'>
+      <div className='joyride-settings-config'>
+        <Title>{t('config')}</Title>
+        <div className='flex pb3'>
+          <div className='flex-auto'>
+            <div className='mw7'>
+              <SettingsInfo
+                t={t}
+                tReady={tReady}
+                config={config}
+                isIpfsConnected={isIpfsConnected}
+                isConfigBlocked={isConfigBlocked}
+                isLoading={isLoading}
+                hasExternalChanges={hasExternalChanges}
+                hasSaveFailed={hasSaveFailed}
+                hasSaveSucceded={hasSaveSucceded} />
+            </div>
           </div>
+          { config
+            ? (
+            <div className='flex flex-column justify-center flex-row-l items-center-l'>
+              <CliTutorMode showIcon={true} config={config} t={t} command={command}/>
+              <Button
+                minWidth={100}
+                height={40}
+                bg='bg-charcoal'
+                className='tc'
+                disabled={isSaving || (!hasLocalChanges && !hasExternalChanges)}
+                onClick={onReset}>
+                {t('app:actions.reset')}
+              </Button>
+              <SaveButton
+                t={t}
+                tReady={tReady}
+                hasErrors={hasErrors}
+                hasSaveFailed={hasSaveFailed}
+                hasSaveSucceded={hasSaveSucceded}
+                hasLocalChanges={hasLocalChanges}
+                hasExternalChanges={hasExternalChanges}
+                isSaving={isSaving}
+                onClick={onSave} />
+            </div>
+              )
+            : null }
         </div>
-        { config ? (
-          <div className='flex flex-column justify-center flex-row-l items-center-l'>
-            <CliTutorMode showIcon={true} config={config} t={t} command={command}/>
-            <Button
-              minWidth={100}
-              height={40}
-              bg='bg-charcoal'
-              className='tc'
-              disabled={isSaving || (!hasLocalChanges && !hasExternalChanges)}
-              onClick={onReset}>
-              {t('app:actions.reset')}
-            </Button>
-            <SaveButton
-              t={t}
-              tReady={tReady}
-              hasErrors={hasErrors}
-              hasSaveFailed={hasSaveFailed}
-              hasSaveSucceded={hasSaveSucceded}
-              hasLocalChanges={hasLocalChanges}
-              hasExternalChanges={hasExternalChanges}
-              isSaving={isSaving}
-              onClick={onSave} />
-          </div>
-        ) : null }
       </div>
-      { config ? (
+      { config
+        ? (
         <JsonEditor
           value={config}
           onChange={onChange}
           readOnly={isSaving}
           key={editorKey} />
-      ) : null }
+          )
+        : null }
     </Box>
     )}
 
@@ -173,11 +198,13 @@ const SaveButton = ({ t, hasErrors, hasSaveFailed, hasSaveSucceded, isSaving, ha
       disabled={!hasLocalChanges || hasErrors}
       danger={hasSaveFailed || hasExternalChanges}
       onClick={onClick}>
-      { hasSaveSucceded && !hasSaveFailed ? (
+      { hasSaveSucceded && !hasSaveFailed
+        ? (
         <Tick height={16} className='fill-snow' style={{ transform: 'scale(3)' }} />
-      ) : (
-        isSaving ? t('app:actions.saving') : t('app:actions.save')
-      )}
+          )
+        : (
+            isSaving ? t('app:actions.saving') : t('app:actions.save')
+          )}
     </Button>
   )
 }
@@ -226,7 +253,7 @@ const SettingsInfo = ({ t, isIpfsConnected, isConfigBlocked, hasExternalChanges,
   }
   return (
     <p className='ma0 mr2 lh-copy charcoal f5'>
-      {t('ipfsConfigDescription')} <a href='https://github.com/ipfs/go-ipfs/blob/master/docs/config.md' rel='noopener noreferrer' target='_blank' className='link blue'>{t('ipfsConfigHelp')}</a>
+      {t('ipfsConfigDescription')} <a href='https://github.com/ipfs/kubo/blob/master/docs/config.md' rel='noopener noreferrer' target='_blank' className='link blue'>{t('ipfsConfigHelp')}</a>
     </p>
   )
 }
@@ -302,7 +329,7 @@ export class SettingsPageContainer extends React.Component {
 
   render () {
     const {
-      t, tReady, isConfigBlocked, ipfsConnected, configIsLoading, configLastError, configIsSaving,
+      t, tReady, isConfigBlocked, ipfsConnected, configIsLoading, configLastError, configIsSaving, arePinningServicesSupported,
       configSaveLastSuccess, configSaveLastError, isIpfsDesktop, analyticsEnabled, doToggleAnalytics, toursEnabled,
       handleJoyrideCallback, isCliTutorModeEnabled, doToggleCliTutorMode, ipfsPendingFirstConnection
     } = this.props
@@ -320,6 +347,7 @@ export class SettingsPageContainer extends React.Component {
         isConfigBlocked={isConfigBlocked}
         isLoading={isLoading}
         isSaving={configIsSaving}
+        arePinningServicesSupported={arePinningServicesSupported}
         hasSaveFailed={hasSaveFailed}
         hasSaveSucceded={hasSaveSucceded}
         hasErrors={hasErrors}
@@ -358,6 +386,7 @@ export default connect(
   'selectIsIpfsDesktop',
   'selectToursEnabled',
   'selectAnalyticsEnabled',
+  'selectArePinningServicesSupported',
   'doToggleAnalytics',
   'doSaveConfig',
   'selectIsCliTutorModeEnabled',

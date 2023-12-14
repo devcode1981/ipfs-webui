@@ -1,8 +1,9 @@
 /* eslint-disable require-yield */
 
 import { join, dirname, basename } from 'path'
-import { getDownloadLink, getShareableLink } from '../../lib/files'
+import { getDownloadLink, getShareableLink, getCarLink } from '../../lib/files'
 import countDirs from '../../lib/count-dirs'
+import memoize from 'p-memoize'
 import all from 'it-all'
 import map from 'it-map'
 import last from 'it-last'
@@ -47,8 +48,18 @@ const fileFromStats = ({ cumulativeSize, type, size, cid, name, path, pinned, is
   name: name || path.split('/').pop() || cid.toString(),
   path: path || `${prefix}/${cid.toString()}`,
   pinned: Boolean(pinned),
-  isParent: isParent
+  isParent
 })
+
+/**
+ * @param {IPFSService} ipfs
+ * @param {string|CID} cidOrPath
+ * @returns {Promise<number>}
+ */
+const cumulativeSize = async (ipfs, cidOrPath) => {
+  const { cumulativeSize } = await stat(ipfs, cidOrPath)
+  return cumulativeSize || 0
+}
 
 /**
  * @param {string} path
@@ -57,17 +68,20 @@ const fileFromStats = ({ cumulativeSize, type, size, cid, name, path, pinned, is
 // TODO: use sth else
 export const realMfsPath = (path) => {
   if (path.startsWith('/files')) {
-    return path.substr('/files'.length) || '/'
+    return path.substring('/files'.length) || '/'
   }
 
   return path
 }
+
+const memStat = memoize((path, ipfs) => ipfs.files.stat(path))
 
 /**
  * @typedef {Object} Stat
  * @property {string} path
  * @property {'file'|'directory'|'unknown'} type
  * @property {CID} cid
+ * @property {number} cumulativeSize
  * @property {number} size
  *
  * @param {IPFSService} ipfs
@@ -81,7 +95,12 @@ const stat = async (ipfs, cidOrPath) => {
     : `/ipfs/${hashOrPath}`
 
   try {
-    const stats = await ipfs.files.stat(path)
+    let stats
+    if (path.startsWith('/ipfs/')) {
+      stats = await memStat(path, ipfs)
+    } else {
+      stats = await ipfs.files.stat(path)
+    }
     return { path, ...stats }
   } catch (e) {
     // Discard error and mark DAG as 'unknown' to unblock listing other pins.
@@ -93,6 +112,7 @@ const stat = async (ipfs, cidOrPath) => {
       path: hashOrPath,
       cid: new CID(cid),
       type: 'unknown',
+      cumulativeSize: 0,
       size: 0
     }
   }
@@ -115,17 +135,6 @@ const getRawPins = async function * (ipfs) {
 const getPinCIDs = (ipfs) => map(getRawPins(ipfs), (pin) => pin.cid)
 
 /**
- * @param {IPFSService} ipfs
- * @returns {AsyncIterable<FileStat>}
- */
-const getPins = async function * (ipfs) {
-  for await (const cid of getPinCIDs(ipfs)) {
-    const info = await stat(ipfs, cid)
-    yield fileFromStats({ ...info, pinned: true }, '/pins')
-  }
-}
-
-/**
  * @typedef {import('./protocol').Message} Message
  * @typedef {import('./protocol').Model} Model
 
@@ -136,6 +145,7 @@ const getPins = async function * (ipfs) {
  * @typedef {Object} ConfigSelectors
  * @property {function():string} selectApiUrl
  * @property {function():string} selectGatewayUrl
+ * @property {function():string} selectPublicGateway
  *
  * @typedef {Object} UnkonwActions
  * @property {function(string):Promise<unknown>} doUpdateHash
@@ -180,20 +190,9 @@ const actions = () => ({
    * @param {Info} info
    * @returns {function(Context): *}
    */
-  doFetch: ({ path, realPath, isMfs, isPins, isRoot }) => perform(ACTIONS.FETCH, async (ipfs, { store }) => {
-    if (isRoot && !isMfs && !isPins) {
+  doFetch: ({ path, realPath, isMfs, isRoot }) => perform(ACTIONS.FETCH, async (ipfs, { store }) => {
+    if (isRoot && !isMfs) {
       throw new Error('not supposed to be here')
-    }
-
-    if (isRoot && isPins) {
-      const pins = await all(getPins(ipfs)) // FIX: pins path
-
-      return {
-        path: '/pins',
-        fetched: Date.now(),
-        type: 'directory',
-        content: pins
-      }
     }
 
     const resolvedPath = realPath.startsWith('/ipns')
@@ -248,11 +247,7 @@ const actions = () => ({
       // as relative paths, so normalise all to be relative.
       .map($ => $.path[0] === '/' ? { ...$, path: $.path.slice(1) } : $)
 
-    const uploadSize = files.reduce((prev, { size }) => prev + size, 0)
-    // Just estimate download size to be around 10% of upload size.
-    const downloadSize = uploadSize * 10 / 100
-    const totalSize = uploadSize + downloadSize
-    let loaded = 0
+    const totalSize = files.reduce((prev, { size }) => prev + size, 0)
 
     const entries = files.map(({ path, size }) => ({ path, size }))
 
@@ -260,9 +255,18 @@ const actions = () => ({
 
     const { result, progress } = importFiles(ipfs, files)
 
-    for await (const update of progress) {
-      loaded += update.loaded
-      yield { entries, progress: loaded / totalSize * 100 }
+    /** @type {null|{uploaded:number, offset:number, name:string}} */
+    let status = null
+
+    for await (const { name, offset } of progress) {
+      status = status == null
+        ? { uploaded: 0, offset, name }
+        : name === status.name
+          ? { uploaded: status.uploaded, offset, name }
+          : { uploaded: status.uploaded + status.offset, offset, name }
+      const progress = (status.uploaded + status.offset) / totalSize * 100
+
+      yield { entries, progress }
     }
 
     try {
@@ -288,8 +292,10 @@ const actions = () => ({
           try {
             await ipfs.files.cp(src, dst)
           } catch (err) {
-            throw Object.assign(new Error('Folder already exists.'), {
-              code: 'ERR_FOLDER_EXISTS'
+            // TODO: Not sure why we do this. Perhaps a generic error is used
+            // to avoid leaking private information via Countly?
+            throw Object.assign(new Error('ipfs.files.cp call failed'), {
+              code: 'ERR_FILES_CP_FAILED'
             })
           }
         }
@@ -305,31 +311,57 @@ const actions = () => ({
   /**
    * Deletes `files` with provided paths. On completion (success sor fail) will
    * trigger `doFilesFetch` to update the state.
-   * @param {string[]} files
+   * @param {Object} args
+   * @param {FileStat[]} args.files
+   * @param {boolean} args.removeLocally
+   * @param {boolean} args.removeRemotely
+   * @param {string[]} args.remoteServices
    */
-  doFilesDelete: (files) => perform(ACTIONS.DELETE, async (ipfs, { store }) => {
+  doFilesDelete: ({ files, removeLocally, removeRemotely, remoteServices }) => perform(ACTIONS.DELETE, async (ipfs, { store }) => {
     ensureMFS(store)
 
-    if (files.length > 0) {
-      const promises = files
-        .map(file => ipfs.files.rm(realMfsPath(file), {
+    if (files.length === 0) return undefined
+
+    /**
+     * Execute function asynchronously in a best-effort fashion.
+     * We don't want any edge case (like a directory with multiple copies of
+     * same file) to crash webui, nor want to bother user with false-negatives
+     * @param {Function} fn
+     */
+    const tryAsync = async fn => { try { await fn() } catch (_) {} }
+
+    try {
+      // try removing from MFS first
+      await Promise.all(
+        files.map(async file => ipfs.files.rm(realMfsPath(file.path), {
           recursive: true
         }))
+      )
 
-      try {
-        await Promise.all(promises)
-
-        const src = files[0]
-        const path = src.slice(0, src.lastIndexOf('/'))
-        await store.doUpdateHash(path)
-
-        return undefined
-      } finally {
-        await store.doFilesFetch()
+      // Pin cleanup only if MFS removal was successful
+      if (removeRemotely) {
+        // remote unpin can be slow, so we do this async in best-effort fashion
+        files.forEach(file => remoteServices.map(async service => tryAsync(() =>
+          ipfs.pin.remote.rm({ cid: [file.cid], service })
+        )))
       }
-    }
 
-    return undefined
+      if (removeLocally) {
+        // removal of local pin can fail if same CID is present twice,
+        // this is done in best-effort as well
+        await Promise.all(files.map(async file => file.pinned && tryAsync(() =>
+          ipfs.pin.rm(file.cid)
+        )))
+      }
+
+      const src = files[0].path
+      const path = src.slice(0, src.lastIndexOf('/'))
+      await store.doUpdateHash(path)
+
+      return undefined
+    } finally {
+      await store.doFilesFetch()
+    }
   }),
 
   /**
@@ -337,18 +369,23 @@ const actions = () => ({
    * trigger `doFilesFetch` to update the state.
    * @param {string} root
    * @param {string} src
+   * @param {string} name
    */
-  doFilesAddPath: (root, src) => perform(ACTIONS.ADD_BY_PATH, async (ipfs, { store }) => {
+  doFilesAddPath: (root, src, name = '') => perform(ACTIONS.ADD_BY_PATH, async (ipfs, { store }) => {
     ensureMFS(store)
 
     const path = realMfsPath(src)
-    /** @type {string} */
-    const name = (path.split('/').pop())
+    const cid = /** @type {string} */(path.split('/').pop())
+
+    if (!name) {
+      name = cid
+    }
+
     const dst = realMfsPath(join(root, name))
-    const srcPath = src.startsWith('/') ? src : `/ipfs/${name}`
+    const srcPath = src.startsWith('/') ? src : `/ipfs/${cid}`
 
     try {
-      return ipfs.files.cp(srcPath, dst)
+      return await ipfs.files.cp(srcPath, dst)
     } finally {
       await store.doFilesFetch()
     }
@@ -359,11 +396,18 @@ const actions = () => ({
    * @param {FileStat[]} files
    */
   doFilesDownloadLink: (files) => perform(ACTIONS.DOWNLOAD_LINK, async (ipfs, { store }) => {
-    ensureMFS(store)
-
     const apiUrl = store.selectApiUrl()
     const gatewayUrl = store.selectGatewayUrl()
     return await getDownloadLink(files, gatewayUrl, apiUrl, ipfs)
+  }),
+
+  /**
+   * Creates a download link for the DAG CAR.
+   * @param {FileStat[]} files
+   */
+  doFilesDownloadCarLink: (files) => perform(ACTIONS.DOWNLOAD_LINK, async (ipfs, { store }) => {
+    const gatewayUrl = store.selectGatewayUrl()
+    return await getCarLink(files, gatewayUrl, ipfs)
   }),
 
   /**
@@ -371,9 +415,9 @@ const actions = () => ({
    * @param {FileStat[]} files
    */
   doFilesShareLink: (files) => perform(ACTIONS.SHARE_LINK, async (ipfs, { store }) => {
-    ensureMFS(store)
-
-    return await getShareableLink(files, ipfs)
+    // ensureMFS deliberately omitted here, see https://github.com/ipfs/ipfs-webui/issues/1744 for context.
+    const publicGateway = store.selectPublicGateway()
+    return await getShareableLink(files, publicGateway, ipfs)
   }),
 
   /**
@@ -503,30 +547,11 @@ const actions = () => ({
   doFilesClear: () => send({ type: ACTIONS.CLEAR_ALL }),
 
   /**
-   * Gets total size of the local pins. On successful completion `state.mfsSize` will get
-   * updated.
-   */
-  doPinsSizeGet: () => perform(ACTIONS.PINS_SIZE_GET, async (ipfs) => {
-    const allPinsCids = await ipfs.pin.ls({ type: 'recursive' })
-
-    let pinsSize = 0
-    let numberOfPins = 0
-
-    for await (const { cid } of allPinsCids) {
-      pinsSize += (await ipfs.files.stat(`/ipfs/${cid.toString()}`)).cumulativeSize
-      numberOfPins++
-    }
-
-    return { pinsSize, numberOfPins }
-  }),
-
-  /**
    * Gets size of the MFS. On successful completion `state.mfsSize` will get
    * updated.
    */
   doFilesSizeGet: () => perform(ACTIONS.SIZE_GET, async (ipfs) => {
-    const stat = await ipfs.files.stat('/')
-    return { size: stat.cumulativeSize }
+    return { size: await cumulativeSize(ipfs, '/') }
   }),
 
   /**
@@ -539,8 +564,7 @@ const actions = () => ({
     */
     async (store) => {
       const ipfs = store.getIpfs()
-      const stat = await ipfs.files.stat(`/ipfs/${cid}`)
-      return stat.cumulativeSize
+      return cumulativeSize(ipfs, cid)
     }
 })
 
@@ -551,13 +575,12 @@ export default actions
  * @param {FileStream[]} files
  */
 const importFiles = (ipfs, files) => {
-  /** @type {Channel<{ total:number, loaded: number}>} */
+  /** @type {Channel<{ offset:number, name: string}>} */
   const channel = new Channel()
   const result = all(ipfs.addAll(files, {
     pin: false,
     wrapWithDirectory: false,
-    onUploadProgress: (event) => channel.send(event),
-    onDownloadProgress: (event) => channel.send(event)
+    progress: (offset, name) => channel.send({ offset, name })
   }))
 
   result.then(() => channel.close(), error => channel.close(error))
@@ -574,15 +597,24 @@ const importFiles = (ipfs, files) => {
  * @param {import('./utils').Sorting} options.sorting
  */
 const dirStats = async (ipfs, cid, { path, isRoot, sorting }) => {
-  const res = await all(ipfs.ls(cid)) || []
+  const entries = await all(ipfs.ls(cid)) || []
+  // Workarounds regression in IPFS HTTP Client that causes
+  // ls on empty dir to return list with that dir only.
+  // @see https://github.com/ipfs/js-ipfs/issues/3566
+  const res = (entries.length === 1 && entries[0].cid.toString() === cid.toString())
+    ? []
+    : entries
   const files = []
-  const showStats = res.length < 100
+
+  // precaution: there was a historical performance issue when too many dirs were present
+  let dirCount = 0
 
   for (const f of res) {
     const absPath = join(path, f.name)
     let file = null
 
-    if (showStats && (f.type === 'directory' || f.type === 'dir')) {
+    if (dirCount < 1000 && (f.type === 'directory' || f.type === 'dir')) {
+      dirCount += 1
       file = fileFromStats({ ...await stat(ipfs, f.cid), path: absPath })
     } else {
       file = fileFromStats({ ...f, path: absPath })
@@ -605,7 +637,7 @@ const dirStats = async (ipfs, cid, { path, isRoot, sorting }) => {
       }
 
       parent = fileFromStats({
-        ...await ipfs.files.stat(parentInfo.realPath),
+        ...await stat(ipfs, parentInfo.realPath),
         path: parentInfo.path,
         name: '..',
         isParent: true
@@ -614,7 +646,7 @@ const dirStats = async (ipfs, cid, { path, isRoot, sorting }) => {
   }
 
   return {
-    path: path,
+    path,
     fetched: Date.now(),
     type: 'directory',
     cid,

@@ -1,16 +1,16 @@
-/* global webuiUrl, ipfs, page, describe, it, expect, beforeAll */
+const { test } = require('./setup/coverage')
 
-describe('Settings screen', () => {
-  beforeAll(async () => {
-    await page.goto(webuiUrl + '#/settings', { waitUntil: 'networkidle0' })
+test.describe('Settings screen', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/#/settings')
   })
 
-  it('should show config of IPFS node', async () => {
-    await expect(page).toMatch('Addresses')
-    await expect(page).toMatch('Bootstrap')
-    await expect(page).toMatch('PeerID')
+  test('should show config of IPFS node', async ({ page }) => {
+    await page.waitForSelector('text=Addresses')
+    await page.waitForSelector('text=Bootstrap')
+    await page.waitForSelector('text=PeerID')
     // check PeerID in config to confirm it comes from expected instance
-    const { id } = await ipfs.id()
-    await expect(page).toMatch(id)
+    const id = process.env.IPFS_RPC_ID
+    await page.waitForSelector(`text=${id}`)
   })
 })

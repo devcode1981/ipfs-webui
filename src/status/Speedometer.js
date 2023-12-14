@@ -5,7 +5,7 @@ import filesize from 'filesize'
 const rotation = (n) => (0.5 + (1 - n)) * Math.PI
 const circumference = (n) => n * 2 * Math.PI
 
-export default function ({ total = 100, title, filled = 0, noSpeed = false, color = '#FF6384' }) {
+function Speedometer ({ total = 100, title, filled = 0, noSpeed = false, color = '#FF6384' }) {
   const doughnut = {
     options: {
       legend: {
@@ -30,10 +30,14 @@ export default function ({ total = 100, title, filled = 0, noSpeed = false, colo
     }
   }
 
+  // network bandwidth units matchin 'ipfs stats bw'
+  // to align with what ISP usually shows on invoice
   const data = filesize(filled, {
+    standard: 'iec',
+    base: 2,
     output: 'array',
     round: 0,
-    bits: !noSpeed
+    bits: false
   })
 
   return (
@@ -49,3 +53,4 @@ export default function ({ total = 100, title, filled = 0, noSpeed = false, colo
     </div>
   )
 }
+export default Speedometer

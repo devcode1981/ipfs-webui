@@ -4,20 +4,25 @@
   "breadcrumbs": "Breadcrumb",
   "finished": "Finito!",
   "totalSize": "Totale: {size}",
-  "filesSelected": "{count, plural, one {File selezionato} other {File selezionati}}",
+  "filesSelected": "{count, plural, one {Oggetto selezionato} many {Oggetti selezionati} other {Oggetti selezionati}}",
   "menuOptions": "Opzioni per oggetti selezionati",
   "selectedAllEntries": "Seleziona tutte le voci della tabella",
   "individualFilesOnly": "Disponibile solamente per file individuali",
   "noPDFSupport": "Il tuo browser non supporta i PDF. Per favore, scarica il PDF per visualizzarlo:",
   "downloadPDF": "Scarica PDF",
-  "downloadInstead": "Prova invece a <1>scaricarlo</1>",
+  "openWithPublicGateway": "Prova ad aprirlo con il tuo <1>gateway pubblico</1>.",
+  "openWithLocalAndPublicGateway": "Prova ad aprirlo con il tuo <1>gateway locale</1> o con il <3>gateway pubblico</3>.",
   "cantBePreviewed": "Ci dispiace, questo file non può essere visualizzato in anteprima",
   "addByPath": "Da IPFS",
   "newFolder": "Nuova cartella",
   "generating": "Generazione...",
   "actions": {
     "copyHash": "Copia CID",
-    "share": "Condividi collegamento"
+    "share": "Condividi collegamento",
+    "publishWithIpns": "Publish to IPNS"
+  },
+  "cliModal": {
+    "extraNotesPinning": "Questo comando è solo per il pinning/unpinning locale. Se vuoi usare un servizio di pinning remoto, consulta la documentazione di quel servizio per imparare come fare il pin/unpin dalla linea di comando."
   },
   "shareModal": {
     "title": "Condividi file",
@@ -29,17 +34,28 @@
     "descriptionFile": "Scegli un nuovo nome per questo file.",
     "descriptionFolder": "Scegli un nuovo nome per questa cartella."
   },
-  "deleteModal": {
-    "titleItem": "{count, plural, one {Elimina oggetto} other {Elimina {count} oggetti}}",
-    "titleFolder": "{count, plural, one {Elimina cartella} other {Elimina {count} cartelle}}",
-    "titleFile": "{count, plural, one {Elimina file} other {Elimina {count} file}}",
-    "descriptionItem": "{count, plural, one {Sei sicuro di voler eliminare questo oggetto? Questa azione è permanente ed irreversibile.} other {Sei sicuro di voler eliminare {count} oggetti? Questa azione è permanente ed irreversibile.}}",
-    "descriptionFolder": "{count, plural, one {Sei sicuro di voler eliminare questa cartella? Questa azione è permanente ed irreversibile.} other {Sei sicuro di voler eliminare {count} cartelle? Questa azione è permanente ed irreversibile.}}",
-    "descriptionFile": "{count, plural, one {Sei sicuro di voler eliminare questo file? Questa azione è permanente ed irreversibile.} other {Sei sicuro di voler eliminare {count} file? Questa azione è permanente ed irreversibile.}}"
+  "removeModal": {
+    "titleItem": "{count, plural, one {Rimuovere l'oggetto? {name}} many {Rimuovere {count} oggetti?} other {Rimuovere {count} oggetti?}}",
+    "titleFolder": "{count, plural, one {Rimuovere cartella? {name}} many {Rimuovere {count} cartelle?} other {Rimuovere {count} cartelle?}}",
+    "titleFile": "{count, plural, one {Rimuovere file? {name}} many {Rimuovere {count} file?} other {Rimuovere {count} file?}}",
+    "descriptionItem": "{count, plural, one {Sei sicuro di voler eliminare questo oggetto? Non comparirà più nella schermata \"File\" e sarà permanentemente rimosso nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.} many {Se sicuro di voler eliminare questi {count} oggetti? Non compariranno più nella schermata \"File\" e saranno permanentemente rimossi nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.} other {Se sicuro di voler eliminare questi {count} oggetti? Non compariranno più nella schermata \"File\" e saranno permanentemente rimossi nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.}}",
+    "descriptionFolder": "{count, plural, one {Sei sicuro di voler eliminare questa cartella? Non comparirà più nella schermata \"File\" e sarà permanentemente rimossa nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.} many {Sei sicuro di voler eliminare queste {count} cartelle? Non compariranno più nella schermata \"File\" e saranno permanentemente rimosse nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.} other {Sei sicuro di voler eliminare queste {count} cartelle? Non compariranno più nella schermata \"File\" e saranno permanentemente rimosse nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.}}",
+    "descriptionFile": "{count, plural, one {Sei sicuro di voler eliminare questo file? Non comparirà più nella schermata \"File\" e sarà permanentemente rimosso nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.} many {Sei sicuro di voler eliminare questi {count} file? Non compariranno più nella schermata \"File\" e saranno permanentemente rimossi nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.} other {Sei sicuro di voler eliminare questi {count} file? Non compariranno più nella schermata \"File\" e saranno permanentemente rimossi nella prossima pulizia programmata (anche se altre copie potrebbero esistere su altri nodi IPFS). Quest'azione non può essere invertita.}}",
+    "checkboxRemoveLocalPin": "Rimuovi anche il pin locale (consigliato)",
+    "checkboxUnpinFromServices": "Unpinna da tutti i servizi di pinning"
+  },
+  "pinningModal": {
+    "title": "Seleziona dove vorresti mettere il pin a questi oggetti.",
+    "complianceLabel": "🔍 Check pinning services' compliance",
+    "footer": "Hai bisogno di aggiungere o configurare un servizio di pinning? Vai alle <1>Impostazioni</1>.",
+    "localNode": "Nodo locale.",
+    "totalSize": "Totale: {size}"
   },
   "addByPathModal": {
     "title": "Importa da IPFS",
     "description": "Inserisci un percorso IPFS (CID) da importare.",
+    "importPathPlaceholder": "Percorso o CID (obbligatorio)",
+    "namePlaceholder": "Nome (facoltativo)",
     "examples": "Esempi:"
   },
   "newFolderModal": {
@@ -51,8 +67,8 @@
     "noFiles": "<0>Nessun file in questo percorso. Clicca il bottone \"Importa\" per aggiungerne.</0>"
   },
   "filesImportStatus": {
-    "imported": "{count, plural, one {1 oggetto importato} other {{count} oggetti importati.}}",
-    "importing": "{count, plural, one {Importazione di 1 oggetto} other {Importazione di {count} oggetti}}",
+    "imported": "{count, plural, one {1 oggetto importato} many {{count} oggetti importati.} other {{count} oggetti importati.}}",
+    "importing": "{count, plural, one {Importazione di 1 oggetto} many {Importazione di {count} oggetti} other {Importazione di {count} oggetti}}",
     "toggleDropdown": "Attiva/Disattiva menù a discesa",
     "closeDropdown": "Chiudi menù a discesa",
     "count": "{count} di {count}"
@@ -67,10 +83,10 @@
     },
     "step2": {
       "title": "Breadcrumb",
-      "paragraph1": "These breadcrumbs display the path to your current directory. You can…",
-      "bullet1": "Click an individual breadcrumb to go to that directory",
-      "bullet2": "Right-click a breadcrumb to get the actions menu for that directory",
-      "bullet3": "Drag files onto a breadcrumb to move or import them"
+      "paragraph1": "Questi tracciati mostrano il percorso verso la tua cartella attuale. Potresti...",
+      "bullet1": "Clicca su un tracciato per andare in quella cartella",
+      "bullet2": "Clicca col tasto destro su un tracciato per visualizzare il menu delle azioni di quella cartella",
+      "bullet3": "Trascina i file su un tracciato per spostarli od importarli"
     },
     "step3": {
       "title": "Aggiungi file",
@@ -81,16 +97,41 @@
     "step5": {
       "title": "Lista di file",
       "paragraph1": "Infine, la lista dove puoi trovare i tuoi file e cartelle. Trascina e rilascia file o cartelle per aggiungerli/e.",
-      "paragraph2": "Puoi condividere o scaricare file, ispezionarli nell'IPLD Explorer, rinominarli od eliminarli!",
+      "paragraph2": "Puoi condividere o scaricare file, ispezionarli nell'IPLD Explorer, rinominarli o rimuoverli!",
       "paragraph3": "Suggerimento: trascina e rilascia un file da qualsiasi pagina del Web UI per aggiungerli al root del tuo MFS."
     }
   },
-  "loadMore": "Load more",
+  "loadMore": "Carica di più",
   "previousFolder": "Torna alla cartella precedente",
   "fileLabel": "Seleziona {type} {name} con dimensione: {size}",
   "hashUnavailable": "Hash non disponibile",
   "checkboxLabel": "Mostra più opzioni per {name}",
   "pinned": "Affissato",
-  "cidNotFileNorDir": "Il collegamento corrente non è né un file né un percorso. Prova invece ad <0>ispezionarlo</0>.",
-  "sortBy": "Ordina oggetti per {name}"
+  "pinnedRemotely": "Pinnato in remoto",
+  "pinningRemotely": "Pinning remotely",
+  "pinningCompleted": "Pinning completed",
+  "pinningFailed": "Pinning failed",
+  "clickToDismiss": "Click to dismiss",
+  "clickToCancel": "Click to cancel",
+  "blocks": "Blocchi",
+  "allBlocks": "Tutti i blocchi",
+  "allBlocksDescription": "Dimensione totale dei blocchi sul tuo intero nodo IPFS; questo include tutto ciò che si trova in Files, più tutti gli elementi localmente pinnati e qualsiasi dato temporaneo nella cache",
+  "filesDescription": "Dimensione totale dei dati nella directory corrente (se è una subdirectory, viene visualizzata anche la dimensione di tutti i dati nei Files)",
+  "pinningQueue": "Pinning queue",
+  "more": "Altro",
+  "files": "File",
+  "cidNotFileNorDir": "Il collegamento attuale non è né un file e né un percorso. Prova ad <1>ispezionarlo</1>.",
+  "sortBy": "Ordina oggetti per {name}",
+  "publishModal": {
+    "title": "Publish to IPNS",
+    "cidToPublish": "CID:",
+    "publishUnderKey": "Select key for publishing:",
+    "help": "Go to Settings to learn about IPNS and create more keys.",
+    "publishedUnderKey": "Successfully published under the key:",
+    "linkCopied": "Link copied!",
+    "sharingPrompt": "Copy the link below and share it with others. The IPNS address will resolve as long as your node remains available on the network once a day to refresh the IPNS record.",
+    "pleaseWait": "Please wait while the initial 20 copies of the updated IPNS record are stored with the help of DHT peers…"
+  },
+  "noPinsInProgress": "All done, no remote pins in progress.",
+  "remotePinningInProgress": "Remote pinning in progress:"
 }

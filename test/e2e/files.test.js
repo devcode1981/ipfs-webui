@@ -1,57 +1,65 @@
-/* global webuiUrl, ipfs, page, describe, it, expect, beforeAll */
-
+const { test } = require('./setup/coverage')
 const { fixtureData } = require('./fixtures')
 const all = require('it-all')
 const filesize = require('filesize')
+const ipfsClient = require('ipfs-http-client')
 
-describe('Files screen', () => {
-  beforeAll(async () => {
-    await page.goto(webuiUrl + '#/files', { waitUntil: 'networkidle0' })
+test.describe('Files screen', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/#/files')
   })
 
   const button = 'button[id="import-button"]'
 
-  it('should have the active Add menu', async () => {
-    await page.waitForSelector(button, { visible: true })
-    await page.click(button)
-    await page.waitForSelector('#add-file', { visible: true })
-    await expect(page).toMatch('File')
-    await expect(page).toMatch('Folder')
-    await expect(page).toMatch('From IPFS')
-    await expect(page).toMatch('New folder')
-    await page.click(button)
+  test('should have the active Add menu', async ({ page }) => {
+    await page.waitForSelector(button, { state: 'visible' })
+    await page.click(button, { force: true })
+    await page.waitForSelector('#add-file', { state: 'visible' })
+    await page.waitForSelector('text=File')
+    await page.waitForSelector('text=Folder')
+    await page.waitForSelector('text=From IPFS')
+    await page.waitForSelector('text=New folder')
+    await page.click(button, { force: true })
   })
 
-  it('should allow for a successful import of two files', async () => {
-    await page.waitForSelector(button, { visible: true })
+  test('should allow for a successful import of two files', async ({ page }) => {
+    await page.waitForSelector(button, { state: 'visible' })
     await page.click(button)
-    await page.waitForSelector('#add-file', { visible: true })
+    await page.waitForSelector('#add-file', { state: 'visible' })
 
     const [fileChooser] = await Promise.all([
-      page.waitForFileChooser(),
+      page.waitForEvent('filechooser'),
       page.click('button[id="add-file"]') // menu button that triggers file selection
     ])
 
     //  select a single static text file via fileChooser
     const file1 = fixtureData('file.txt')
     const file2 = fixtureData('file2.txt')
-    await fileChooser.accept([file1.path, file2.path])
+    await fileChooser.setFiles([file1.path, file2.path])
 
     // expect file with matching filename to be added to the file list
     await page.waitForSelector('.File')
-    await expect(page).toMatch('file.txt')
-    await expect(page).toMatch('file2.txt')
+    await page.waitForSelector('text=file.txt')
+    await page.waitForSelector('text=file2.txt')
 
     // expect valid CID to be present on the page
+    const ipfs = ipfsClient(process.env.IPFS_RPC_ADDR)
     const [result1, result2] = await all(ipfs.addAll([file1.data, file2.data]))
-    await expect(page).toMatch(result1.cid.toString())
-    await expect(page).toMatch(result2.cid.toString())
+    await page.waitForSelector(`text=${result1.cid.toString()}`)
+    await page.waitForSelector(`text=${result2.cid.toString()}`)
 
-    // expect human readable sizes
+    // expect human readable sizes in format from ./src/lib/files.js#humanSize
     // → this ensures metadata was correctly read for each item in the MFS
-    const human = (b) => (b ? filesize(b, { round: 0 }) : '-')
+    const human = (b) => (b
+      ? filesize(b, {
+        standard: 'iec',
+        base: 2,
+        round: b >= 1073741824 ? 1 : 0
+      })
+      : '-')
     for await (const file of ipfs.files.ls('/')) {
-      await expect(page).toMatch(human(file.size))
+      await page.waitForSelector(`text=${file.name}`)
+      await page.waitForSelector(`text=${human(file.size)}`)
     }
   })
 })

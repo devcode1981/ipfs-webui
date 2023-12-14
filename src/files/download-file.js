@@ -1,4 +1,4 @@
-export default (srcUrl, filename, progressCallback, method = 'GET') => {
+const downloadFile = (srcUrl, filename, progressCallback, method = 'GET') => {
   const xhr = new window.XMLHttpRequest()
   let total = 0
 
@@ -29,7 +29,9 @@ export default (srcUrl, filename, progressCallback, method = 'GET') => {
   }
 
   xhr.onprogress = (e) => {
-    total = e.lengthComputable ? e.total : (total ||
+    total = e.lengthComputable
+      ? e.total
+      : (total ||
       xhr.getResponseHeader('X-Content-Length') ||
       xhr.getResponseHeader('Content-Length'))
 
@@ -39,3 +41,4 @@ export default (srcUrl, filename, progressCallback, method = 'GET') => {
   xhr.send()
   return { abort }
 }
+export default downloadFile
